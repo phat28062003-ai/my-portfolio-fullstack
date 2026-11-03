@@ -126,7 +126,7 @@ export default function App() {
               <div className="card" style={{ textAlign: 'center', padding: '50px 30px' }}>
                 {profile.avatar && (
                   <img
-                    src={profile.avatar.startsWith('http') ? profile.avatar : `http://127.0.0.1:8000${profile.avatar.startsWith('/') ? '' : '/'}${profile.avatar}`}
+                    src={profile.avatar.startsWith('http') ? profile.avatar : `https://Phatne.pythonanywhere.com${profile.avatar.startsWith('/') ? '' : '/'}${profile.avatar}`}
                     alt={profile.full_name}
                     style={{
                       width: '130px',
@@ -280,7 +280,7 @@ export default function App() {
                         src={
                           b.image.startsWith('http')
                             ? b.image
-                            : `http://127.0.0.1:8000${b.image.startsWith('/') ? '' : '/'}${b.image}`
+                            : `https://Phatne.pythonanywhere.com${b.image.startsWith('/') ? '' : '/'}${b.image}`
                         }
                         alt={b.title}
                         className="blog-img"
@@ -294,7 +294,7 @@ export default function App() {
               ))
             ) : (
               <div className="card" style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
-                <p>Chưa có bài viết nhật ký nào. Truy cập <a href="http://127.0.0.1:8000/admin/" target="_blank" rel="noreferrer" style={{ color: '#38bdf8', textDecoration: 'underline' }}>Django Admin</a> để thêm bài viết mới.</p>
+                <p>Chưa có bài viết nhật ký nào. Truy cập <a href="https://Phatne.pythonanywhere.com/admin/" target="_blank" rel="noreferrer" style={{ color: '#38bdf8', textDecoration: 'underline' }}>Django Admin</a> để thêm bài viết mới.</p>
               </div>
             )}
           </div>
