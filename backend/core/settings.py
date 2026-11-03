@@ -136,3 +136,4 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # Cấu hình đường dẫn lưu static files cho Production
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+CORS_ALLOW_ALL_ORIGINS = True
