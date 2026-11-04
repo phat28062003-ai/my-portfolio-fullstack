@@ -258,42 +258,38 @@ body::after {
   transform: translateY(-4px);
   box-shadow: 0 6px 25px rgba(56, 189, 248, 0.6);
 }
-/* --- Cấu hình chuẩn hóa Responsive cho Mobile --- */
+/* --- Tối ưu hóa kích thước Navbar riêng cho điện thoại --- */
 @media screen and (max-width: 768px) {
-  /* Đảm bảo toàn bộ khung chứa không bị tràn ngang màn hình */
-  body, html {
-    overflow-x: hidden !important;
-    max-width: 100vw !important;
-  }
-
-  /* Định dạng lại thanh điều hướng (Navbar) trên di động */
+  /* Khung chứa menu: Giới hạn chiều rộng và bật cuộn ngang mượt */
   .navbar {
-    flex-wrap: wrap !important;
-    padding: 8px 12px !important;
-    gap: 8px !important;
-    justify-content: center !important;
-    border-radius: 20px !important;
+    width: 92% !important;
+    max-width: 92% !important;
     margin: 10px auto !important;
-    max-width: 95% !important;
+    padding: 6px 8px !important;
+    display: flex !important;
+    justify-content: flex-start !important; /* Xếp nối tiếp nhau */
+    align-items: center !important;
+    overflow-x: auto !important; /* Bật cuộn ngang nếu vuốt */
+    white-space: nowrap !important;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 30px !important;
   }
 
-  /* Thu nhỏ nút bấm trên menu để vừa khít màn hình nhỏ */
+  /* Ẩn thanh cuộn xấu xí của trình duyệt */
+  .navbar::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  /* Thu nhỏ các nút bấm menu cho vừa vặn */
   .nav-btn {
-    padding: 6px 12px !important;
-    font-size: 0.85rem !important;
+    padding: 6px 10px !important; /* Giảm độ dày nút */
+    font-size: 0.75rem !important; /* Thu nhỏ cỡ chữ */
+    letter-spacing: 0px !important;
+    flex-shrink: 0 !important; /* Không bị co ép méo chữ */
   }
 
-  /* Căn chỉnh lại khoảng cách các khối nội dung và card */
-  .container, .tab-content {
-    padding: 15px 10px !important;
-    margin: 10px auto !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-  }
-
-  /* Thu nhỏ tiêu đề profile cho cân đối trên điện thoại */
+  /* Thu nhỏ font chữ tiêu đề Profile cho cân đối */
   .profile-title {
-    font-size: 2.2rem !important;
-    letter-spacing: -0.5px !important;
+    font-size: 1.8rem !important;
   }
 }
