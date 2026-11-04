@@ -28,7 +28,20 @@ export default function App() {
 
   useEffect(() => {
     getProfile().then(setProfile);
-    getProjects().then(setProjects);
+    
+    // Lấy projects từ API sau đó gộp thêm dự án Todo Full-stack vào đầu danh sách
+    getProjects().then((apiProjects) => {
+      const todoAppProject = {
+        id: 'todo-fullstack-fixed',
+        title: 'Full-stack Todo Application',
+        description: 'Ứng dụng quản lý công việc toàn diện, xây dựng với Django REST Framework ở Backend và TypeScript/Vite ở Frontend với giao diện responsive tối ưu.',
+        technology: 'TypeScript',
+        github: 'https://github.com/phat28062003-ai/todo-fullstack',
+        demo: 'https://phat28062003-ai.github.io/my-portfolio-fullstack/'
+      };
+      setProjects([todoAppProject, ...(Array.isArray(apiProjects) ? apiProjects : [])]);
+    });
+
     getSkills().then(setSkills);
     getExperiences().then(setExperiences);
     getBlogPosts().then(setBlogs);
@@ -86,7 +99,7 @@ export default function App() {
     setContactForm({ name: '', email: '', message: '' });
   };
 
-  const technologies = ['All', ...Array.from(new Set(projects.map(p => p.technology)))];
+  const technologies = ['All', ...Array.from(new Set(projects.map(p => p.technology).filter(Boolean)))];
   const filteredProjects = selectedTech === 'All'
     ? projects
     : projects.filter(p => p.technology === selectedTech);
@@ -180,12 +193,28 @@ export default function App() {
 
             {filteredProjects.length > 0 ? (
               filteredProjects.map((p) => (
-                <div key={p.id} className="card">
+                <div key={p.id} className="card" style={{ position: 'relative' }}>
                   <h3 style={{ fontSize: '1.4rem', marginBottom: '10px', color: '#38bdf8' }}>{p.title}</h3>
                   <p style={{ color: 'var(--text-muted)', lineHeight: '1.6', marginBottom: '15px' }}>{p.description}</p>
-                  <span style={{ background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8', padding: '6px 14px', borderRadius: '20px', fontSize: '0.82rem', fontWeight: 600 }}>
-                    🛠 {p.technology}
-                  </span>
+                  
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                    <span style={{ background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8', padding: '6px 14px', borderRadius: '20px', fontSize: '0.82rem', fontWeight: 600 }}>
+                      🛠 {p.technology}
+                    </span>
+                    
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                      {p.github && (
+                        <a href={p.github} target="_blank" rel="noreferrer" style={{ color: '#38bdf8', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 600 }}>
+                          GitHub ↗
+                        </a>
+                      )}
+                      {p.demo && (
+                        <a href={p.demo} target="_blank" rel="noreferrer" style={{ color: '#c084fc', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 600 }}>
+                          Live Demo ↗
+                        </a>
+                      )}
+                    </div>
+                  </div>
                 </div>
               ))
             ) : (
