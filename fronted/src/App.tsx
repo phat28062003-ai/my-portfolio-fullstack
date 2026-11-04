@@ -27,24 +27,37 @@ export default function App() {
   const [showGithubWidget, setShowGithubWidget] = useState(true);
 
   useEffect(() => {
-    getProfile().then(setProfile);
+    getProfile().then(setProfile).catch(() => {});
     
-    // Lấy projects từ API sau đó gộp thêm dự án Todo Full-stack vào đầu danh sách
-    getProjects().then((apiProjects) => {
-      const todoAppProject = {
-        id: 'todo-fullstack-fixed',
-        title: 'Full-stack Todo Application',
-        description: 'Ứng dụng quản lý công việc toàn diện, xây dựng với Django REST Framework ở Backend và TypeScript/Vite ở Frontend với giao diện responsive tối ưu.',
-        technology: 'TypeScript',
-        github: 'https://github.com/phat28062003-ai/todo-fullstack',
-        demo: 'https://phat28062003-ai.github.io/my-portfolio-fullstack/'
-      };
-      setProjects([todoAppProject, ...(Array.isArray(apiProjects) ? apiProjects : [])]);
-    });
+    // Dự án Todo Full-stack hiển thị cố định
+    const todoAppProject = {
+      id: 'todo-fullstack-fixed',
+      title: 'Full-stack Todo Application',
+      description: 'Ứng dụng quản lý công việc toàn diện, xây dựng với Django REST Framework ở Backend và TypeScript/Vite ở Frontend với giao diện responsive tối ưu.',
+      technology: 'TypeScript',
+      github: 'https://github.com/phat28062003-ai/todo-fullstack',
+      demo: 'https://phat28062003-ai.github.io/my-portfolio-fullstack/'
+    };
 
-    getSkills().then(setSkills);
-    getExperiences().then(setExperiences);
-    getBlogPosts().then(setBlogs);
+    // Đặt mặc định dự án Todo ngay từ đầu
+    setProjects([todoAppProject]);
+
+    // Gọi API lấy thêm danh sách từ backend (nếu backend hoạt động)
+    getProjects()
+      .then((apiProjects) => {
+        if (Array.isArray(apiProjects) && apiProjects.length > 0) {
+          // Lọc trùng nếu backend đã có dự án này
+          const otherProjects = apiProjects.filter((p: any) => p.title !== todoAppProject.title);
+          setProjects([todoAppProject, ...otherProjects]);
+        }
+      })
+      .catch((err) => {
+        console.warn("Backend API offline/error, keeping default projects:", err);
+      });
+
+    getSkills().then(setSkills).catch(() => {});
+    getExperiences().then(setExperiences).catch(() => {});
+    getBlogPosts().then(setBlogs).catch(() => {});
 
     const handleScroll = () => {
       if (window.scrollY > 300) {
@@ -202,7 +215,7 @@ export default function App() {
                       🛠 {p.technology}
                     </span>
                     
-                    <div style={{ display: 'flex', gap: '10px' }}>
+                    <div style={{ display: 'flex', gap: '12px' }}>
                       {p.github && (
                         <a href={p.github} target="_blank" rel="noreferrer" style={{ color: '#38bdf8', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 600 }}>
                           GitHub ↗
@@ -223,7 +236,7 @@ export default function App() {
               </div>
             )}
 
-            {/* Nút bật/tắt tạm thời Widget Thống kê GitHub để tránh lỗi 503 */}
+            {/* Nút bật/tắt tạm thời Widget Thống kê GitHub */}
             <div style={{ textAlign: 'right', marginTop: '20px' }}>
               <button
                 onClick={() => setShowGithubWidget(!showGithubWidget)}
