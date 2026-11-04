@@ -326,3 +326,31 @@ body::after {
     white-space: nowrap;
   }
 }
+/* --- SỬA TRIỆT ĐỂ THANH MENU TRÊN MOBILE --- */
+@media screen and (max-width: 768px) {
+  /* Ép thanh chứa menu bọc gọn trong màn hình, cho phép vuốt cuộn ngang hoặc tự xuống dòng */
+  header nav, .nav-links, .navbar-nav {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    justify-content: flex-start !important;
+    gap: 6px !important;
+    padding: 8px 4px !important;
+    width: 100% !important;
+    box-sizing: border-box;
+  }
+
+  /* Ẩn bớt thanh cuộn ngang cho giao diện đẹp mắt */
+  header nav::-webkit-scrollbar, .nav-links::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Thu nhỏ kích thước và padding các nút menu để vừa khít màn hình nhỏ */
+  header nav a, .nav-links button, .navbar-nav a, .nav-links a {
+    font-size: 0.75rem !important;
+    padding: 5px 8px !important;
+    white-space: nowrap !important;
+    flex-shrink: 0;
+  }
+}
