@@ -258,72 +258,42 @@ body::after {
   transform: translateY(-4px);
   box-shadow: 0 6px 25px rgba(56, 189, 248, 0.6);
 }
-/* --- TỐI ƯU HÓA TOÀN DIỆN GIAO DIỆN MOBILE (< 768px) --- */
+/* --- Cấu hình chuẩn hóa Responsive cho Mobile --- */
 @media screen and (max-width: 768px) {
-  /* 1. Thiết lập tổng thể trang tránh tràn ngang */
+  /* Đảm bảo toàn bộ khung chứa không bị tràn ngang màn hình */
   body, html {
-    overflow-x: hidden;
-    font-size: 14px;
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
   }
 
-  /* 2. Cân chỉnh container và khối chính */
-  .container, main, section {
-    width: 100% !important;
-    padding-left: 12px !important;
-    padding-right: 12px !important;
-    box-sizing: border-box;
+  /* Định dạng lại thanh điều hướng (Navbar) trên di động */
+  .navbar {
+    flex-wrap: wrap !important;
+    padding: 8px 12px !important;
+    gap: 8px !important;
+    justify-content: center !important;
+    border-radius: 20px !important;
+    margin: 10px auto !important;
+    max-width: 95% !important;
   }
 
-  /* 3. Chuyển các khối dạng lưới/flex ngang thành xếp dọc */
-  .grid-cols-2, .grid-cols-3, .grid-cols-4, 
-  .flex.row, .projects-grid, .skills-grid {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 16px !important;
-    width: 100% !important;
+  /* Thu nhỏ nút bấm trên menu để vừa khít màn hình nhỏ */
+  .nav-btn {
+    padding: 6px 12px !important;
+    font-size: 0.85rem !important;
   }
 
-  /* 4. Điều chỉnh kích thước tiêu đề */
-  h1 {
-    font-size: 1.75rem !important;
-    line-height: 1.3 !important;
-  }
-  
-  h2 {
-    font-size: 1.35rem !important;
+  /* Căn chỉnh lại khoảng cách các khối nội dung và card */
+  .container, .tab-content {
+    padding: 15px 10px !important;
+    margin: 10px auto !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
 
-  /* 5. Tối ưu hóa các thẻ card dự án / kỹ năng */
-  .project-card, .skill-card, .card {
-    width: 100% !important;
-    margin-bottom: 12px !important;
-    padding: 16px !important;
-  }
-
-  /* 6. THANH MENU / ĐIỀU HƯỚNG: Ép nằm gọn, cuộn ngang mượt mà, không bị mất nút */
-  header nav, .nav-links, .navbar-nav {
-    display: flex !important;
-    flex-wrap: nowrap !important;
-    overflow-x: auto !important;
-    -webkit-overflow-scrolling: touch;
-    justify-content: flex-start !important;
-    align-items: center !important;
-    gap: 6px !important;
-    padding: 8px 4px !important;
-    width: 100% !important;
-    box-sizing: border-box;
-  }
-
-  /* Ẩn thanh cuộn ngang mặc định */
-  header nav::-webkit-scrollbar, .nav-links::-webkit-scrollbar, .navbar-nav::-webkit-scrollbar {
-    display: none;
-  }
-
-  /* Thu nhỏ chữ và khoảng cách của từng nút bấm trong menu để hiện đủ các mục */
-  header nav a, .nav-links button, .navbar-nav a, .nav-links a {
-    font-size: 0.75rem !important;
-    padding: 5px 8px !important;
-    white-space: nowrap !important;
-    flex-shrink: 0 !important;
+  /* Thu nhỏ tiêu đề profile cho cân đối trên điện thoại */
+  .profile-title {
+    font-size: 2.2rem !important;
+    letter-spacing: -0.5px !important;
   }
 }
