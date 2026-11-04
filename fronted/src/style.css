@@ -258,15 +258,15 @@ body::after {
   transform: translateY(-4px);
   box-shadow: 0 6px 25px rgba(56, 189, 248, 0.6);
 }
-/* --- TỐI ƯU HÓA GIAO DIỆN CHO MOBILE (< 768px) --- */
+/* --- TỐI ƯU HÓA TOÀN DIỆN GIAO DIỆN MOBILE (< 768px) --- */
 @media screen and (max-width: 768px) {
-  /* 1. Thiết lập lại tổng thể trang để tránh tràn ngang màn hình */
+  /* 1. Thiết lập tổng thể trang tránh tràn ngang */
   body, html {
     overflow-x: hidden;
-    font-size: 14px; /* Thu nhỏ cỡ chữ nền một chút cho vừa mắt di động */
+    font-size: 14px;
   }
 
-  /* 2. Cân chỉnh lại các container hoặc thẻ bọc chính */
+  /* 2. Cân chỉnh container và khối chính */
   .container, main, section {
     width: 100% !important;
     padding-left: 12px !important;
@@ -274,7 +274,7 @@ body::after {
     box-sizing: border-box;
   }
 
-  /* 3. Chuyển các khối dạng lưới (Grid/Flex) ngang thành xếp dọc trên điện thoại */
+  /* 3. Chuyển các khối dạng lưới/flex ngang thành xếp dọc */
   .grid-cols-2, .grid-cols-3, .grid-cols-4, 
   .flex.row, .projects-grid, .skills-grid {
     display: flex !important;
@@ -283,7 +283,7 @@ body::after {
     width: 100% !important;
   }
 
-  /* 4. Điều chỉnh kích thước tiêu đề (Heading) cho cân đối */
+  /* 4. Điều chỉnh kích thước tiêu đề */
   h1 {
     font-size: 1.75rem !important;
     line-height: 1.3 !important;
@@ -293,64 +293,37 @@ body::after {
     font-size: 1.35rem !important;
   }
 
-  /* 5. Tối ưu hóa các thẻ card hiển thị dự án / kỹ năng trên mobile */
+  /* 5. Tối ưu hóa các thẻ card dự án / kỹ năng */
   .project-card, .skill-card, .card {
     width: 100% !important;
     margin-bottom: 12px !important;
     padding: 16px !important;
   }
 
-  /* 6. Thanh điều hướng (Navbar / Menu) nếu có */
-  nav, .navbar {
-    flex-direction: column;
-    align-items: center;
-    padding: 10px;
-  }
-}
-/* --- SỬA LỖI TRÀN MENU TRÊN MOBILE --- */
-@media screen and (max-width: 768px) {
-  /* Ép thanh chứa các nút điều hướng chuyển thành dạng cuộn ngang hoặc tự xuống dòng gọn gàng */
-  header nav, .nav-links, .navbar-nav {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    justify-content: center !important;
-    gap: 8px !important;
-    padding: 6px !important;
-    width: 100% !important;
-  }
-
-  /* Thu nhỏ khoảng cách và kích thước chữ của các nút menu cho vừa khít màn hình */
-  header nav a, .nav-links button, .navbar-nav a {
-    font-size: 0.8rem !important;
-    padding: 6px 10px !important;
-    white-space: nowrap;
-  }
-}
-/* --- SỬA TRIỆT ĐỂ THANH MENU TRÊN MOBILE --- */
-@media screen and (max-width: 768px) {
-  /* Ép thanh chứa menu bọc gọn trong màn hình, cho phép vuốt cuộn ngang hoặc tự xuống dòng */
+  /* 6. THANH MENU / ĐIỀU HƯỚNG: Ép nằm gọn, cuộn ngang mượt mà, không bị mất nút */
   header nav, .nav-links, .navbar-nav {
     display: flex !important;
     flex-wrap: nowrap !important;
     overflow-x: auto !important;
     -webkit-overflow-scrolling: touch;
     justify-content: flex-start !important;
+    align-items: center !important;
     gap: 6px !important;
     padding: 8px 4px !important;
     width: 100% !important;
     box-sizing: border-box;
   }
 
-  /* Ẩn bớt thanh cuộn ngang cho giao diện đẹp mắt */
-  header nav::-webkit-scrollbar, .nav-links::-webkit-scrollbar {
+  /* Ẩn thanh cuộn ngang mặc định */
+  header nav::-webkit-scrollbar, .nav-links::-webkit-scrollbar, .navbar-nav::-webkit-scrollbar {
     display: none;
   }
 
-  /* Thu nhỏ kích thước và padding các nút menu để vừa khít màn hình nhỏ */
+  /* Thu nhỏ chữ và khoảng cách của từng nút bấm trong menu để hiện đủ các mục */
   header nav a, .nav-links button, .navbar-nav a, .nav-links a {
     font-size: 0.75rem !important;
     padding: 5px 8px !important;
     white-space: nowrap !important;
-    flex-shrink: 0;
+    flex-shrink: 0 !important;
   }
 }
