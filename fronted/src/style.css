@@ -16,6 +16,7 @@
   --text-muted: #64748b;
 }
 
+/* Sửa lỗi dấu * thiếu ở thẻ reset */
 * {
   margin: 0;
   padding: 0;
@@ -224,6 +225,7 @@ body::after {
   width: 100%;
   box-shadow: 0 6px 25px rgba(56, 189, 248, 0.4);
 }
+
 /* Nút Cuộn Về Đầu Trang (Scroll to Top) */
 .scroll-to-top {
   position: fixed;
@@ -258,22 +260,8 @@ body::after {
   transform: translateY(-4px);
   box-shadow: 0 6px 25px rgba(56, 189, 248, 0.6);
 }
-/* --- TỰ ĐỘNG ĐIỀU CHỈNH TRÊN MỌI THIẾT BỊ (RESPONSIVE TOÀN DIỆN) --- */
 
-/* Mặc định cho màn hình lớn (Laptop / PC) */
-.navbar {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  max-width: 800px;
-  margin: 20px auto;
-  border-radius: 50px;
-  box-sizing: border-box;
-}
-
-/* Tự động co giãn khi sang màn hình nhỏ (Tablet và Điện thoại) */
+/* --- TỐI ƯU RESPONSIVE THÔNG MINH CHO MỌI THIẾT BỊ --- */
 @media screen and (max-width: 900px) {
   body, html {
     width: 100% !important;
@@ -281,22 +269,30 @@ body::after {
     overflow-x: hidden !important;
   }
 
+  /* Chuyển menu thành dạng trượt ngang mượt mà trên điện thoại, tránh bị tràn hoặc mất nút */
   .navbar {
-    width: 92% !important;
+    width: 94% !important;
     max-width: 100% !important;
     margin: 10px auto !important;
     padding: 6px 10px !important;
-    flex-wrap: wrap !important; /* Cho phép các nút tự động xuống dòng nếu hết chỗ */
-    justify-content: center !important;
+    display: flex !important;
+    justify-content: flex-start !important;
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+    -webkit-overflow-scrolling: touch;
     gap: 6px !important;
     border-radius: 24px !important;
   }
 
+  /* Ẩn thanh cuộn ngang của menu cho đẹp mắt */
+  .navbar::-webkit-scrollbar {
+    display: none !important;
+  }
+
   .nav-btn {
-    padding: 6px 10px !important;
-    font-size: clamp(0.7rem, 2.5vw, 0.85rem) !important; /* Tự động đổi cỡ chữ theo khung màn hình */
-    flex: 0 1 auto !important;
-    white-space: nowrap !important;
+    padding: 6px 12px !important;
+    font-size: clamp(0.75rem, 2.5vw, 0.85rem) !important;
+    flex-shrink: 0 !important;
     border-radius: 16px !important;
   }
 
@@ -309,12 +305,12 @@ body::after {
   .card {
     width: 100% !important;
     max-width: 100% !important;
-    padding: 18px 14px !important;
+    padding: 20px 16px !important;
     box-sizing: border-box !important;
     border-radius: 20px !important;
   }
 
   .profile-title {
-    font-size: clamp(1.5rem, 6vw, 2rem) !important; /* Tiêu đề tự co giãn theo kích thước màn hình thực tế */
+    font-size: clamp(1.8rem, 6vw, 2.4rem) !important;
   }
 }
