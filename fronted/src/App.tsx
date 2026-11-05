@@ -29,14 +29,14 @@ export default function App() {
   useEffect(() => {
     getProfile().then(setProfile).catch(() => {});
     
-    // Dự án Todo Full-stack hiển thị cố định
+    // Dự án Todo Full-stack hiển thị cố định (Đã cập nhật đúng link demo của bạn)
     const todoAppProject = {
       id: 'todo-fullstack-fixed',
       title: 'Full-stack Todo Application',
       description: 'Ứng dụng quản lý công việc toàn diện, xây dựng với Django REST Framework ở Backend và TypeScript/Vite ở Frontend với giao diện responsive tối ưu.',
       technology: 'TypeScript',
-      github: 'https://github.com/phat28062003-ai/todo-fullstack',
-      demo: 'https://phat28062003-ai.github.io/my-portfolio-fullstack/'
+      github: 'https://github.com/phat28062003-ai',
+      demo: 'https://todo-frontend-phat-fa71.vercel.app'
     };
 
     // Đặt mặc định dự án Todo ngay từ đầu
@@ -221,8 +221,8 @@ export default function App() {
                           GitHub ↗
                         </a>
                       )}
-                      {p.demo && (
-                        <a href={p.demo} target="_blank" rel="noreferrer" style={{ color: '#c084fc', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 600 }}>
+                      {(p.demo || p.live_demo) && (
+                        <a href={p.demo || p.live_demo} target="_blank" rel="noreferrer" style={{ color: '#c084fc', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 600 }}>
                           Live Demo ↗
                         </a>
                       )}
