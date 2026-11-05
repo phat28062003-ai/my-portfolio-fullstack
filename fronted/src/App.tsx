@@ -36,7 +36,7 @@ export default function App() {
       description: 'Ứng dụng quản lý công việc toàn diện, xây dựng với Django REST Framework ở Backend và TypeScript/Vite ở Frontend với giao diện responsive tối ưu.',
       technology: 'TypeScript',
       github: 'https://github.com/phat28062003-ai',
-      demo: 'https://todo-frontend-phat-fa71.vercel.app'
+      demo: 'https://todo-frontend-phat-fa71.vercel.app/#/'
     };
 
     // Đặt mặc định dự án Todo ngay từ đầu
