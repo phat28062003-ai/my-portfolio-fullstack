@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import confetti from 'canvas-confetti';
 import {
   getProfile, getProjects, getSkills,
-  getExperiences, getBlogPosts, sendContactMessage
+  getExperiences, getBlogPosts
 } from './api';
 import './style.css';
 
@@ -20,8 +20,10 @@ export default function App() {
   const [typedTitle, setTypedTitle] = useState('');
   const [showScrollTop, setShowScrollTop] = useState(false);
 
+  // Formspree state (Sử dụng đúng endpoint của bạn)
   const [contactForm, setContactForm] = useState({ name: '', email: '', message: '' });
   const [statusMsg, setStatusMsg] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // State để ẩn/hiện widget GitHub tạm thời khi bị lỗi 503
   const [showGithubWidget, setShowGithubWidget] = useState(true);
@@ -97,19 +99,44 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Tích hợp gửi tin nhắn qua Formspree để nhận thông báo về email
   const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!contactForm.name || !contactForm.email || !contactForm.message) return;
-    await sendContactMessage(contactForm);
 
-    confetti({
-      particleCount: 120,
-      spread: 70,
-      origin: { y: 0.6 }
-    });
+    setIsSubmitting(true);
+    setStatusMsg('');
 
-    setStatusMsg('🚀 Tuyệt vời! Tin nhắn của bạn đã được gửi thành công.');
-    setContactForm({ name: '', email: '', message: '' });
+    try {
+      const response = await fetch("https://formspree.io/f/xnppryjl", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify({
+          name: contactForm.name,
+          email: contactForm.email,
+          message: contactForm.message
+        })
+      });
+
+      if (response.ok) {
+        confetti({
+          particleCount: 120,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+        setStatusMsg('🚀 Tuyệt vời! Tin nhắn của bạn đã được gửi thành công và chuyển đến email của tôi.');
+        setContactForm({ name: '', email: '', message: '' });
+      } else {
+        setStatusMsg('❌ Có lỗi xảy ra khi gửi. Vui lòng thử lại sau!');
+      }
+    } catch (error) {
+      setStatusMsg('❌ Lỗi kết nối mạng. Vui lòng kiểm tra lại!');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const technologies = ['All', ...Array.from(new Set(projects.map(p => p.technology).filter(Boolean)))];
@@ -348,7 +375,7 @@ export default function App() {
             <h2 style={{ fontSize: '1.8rem', marginBottom: '10px', color: 'var(--text-main)' }}>📬 Hộp Thư Liên Hệ</h2>
             <p style={{ color: 'var(--text-muted)', marginBottom: '25px' }}>Hãy gửi lời nhắn cho tôi!</p>
             {statusMsg && (
-              <div style={{ background: 'rgba(74, 222, 128, 0.1)', color: '#4ade80', padding: '12px 16px', borderRadius: '12px', marginBottom: '20px', fontWeight: 500 }}>
+              <div style={{ background: statusMsg.includes('❌') ? 'rgba(239, 68, 68, 0.1)' : 'rgba(74, 222, 128, 0.1)', color: statusMsg.includes('❌') ? '#ef4444' : '#4ade80', padding: '12px 16px', borderRadius: '12px', marginBottom: '20px', fontWeight: 500 }}>
                 {statusMsg}
               </div>
             )}
@@ -357,6 +384,7 @@ export default function App() {
                 <label>Họ và Tên</label>
                 <input
                   type="text"
+                  name="name"
                   className="form-input"
                   placeholder="Nguyễn Văn A"
                   required
@@ -368,6 +396,7 @@ export default function App() {
                 <label>Email</label>
                 <input
                   type="email"
+                  name="email"
                   className="form-input"
                   placeholder="name@example.com"
                   required
@@ -379,6 +408,7 @@ export default function App() {
                 <label>Nội dung</label>
                 <textarea
                   rows={5}
+                  name="message"
                   className="form-textarea"
                   placeholder="Nội dung tin nhắn..."
                   required
@@ -386,7 +416,9 @@ export default function App() {
                   onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
                 ></textarea>
               </div>
-              <button type="submit" className="submit-btn">Gửi Lời Nhắn 🚀</button>
+              <button type="submit" className="submit-btn" disabled={isSubmitting}>
+                {isSubmitting ? 'Đang gửi...' : 'Gửi Lời Nhắn 🚀'}
+              </button>
             </form>
           </div>
         )}
