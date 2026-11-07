@@ -6,6 +6,258 @@ import {
 } from './api';
 import './style.css';
 
+// ==========================================
+// COMPONENT: CYBERPUNK AI CHAT WIDGET
+// ==========================================
+interface Message {
+  sender: 'user' | 'ai';
+  text: string;
+}
+
+function AIChatWidget() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [messages, setMessages] = useState<Message[]>([
+    { sender: 'ai', text: '⚡ Chào bạn! Tôi là hệ thống AI trực tuyến đại diện cho Tiến Phát. Hân hạnh phục vụ bạn?' }
+  ]);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSend = async () => {
+    if (!input.trim() || loading) return;
+
+    const userMsg = input.trim();
+    setMessages((prev) => [...prev, { sender: 'user', text: userMsg }]);
+    setInput('');
+    setLoading(true);
+
+    try {
+      const res = await fetch('http://127.0.0.1:8000/api/ai-chat/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: userMsg }),
+      });
+      const data = await res.json();
+      
+      if (res.ok) {
+        setMessages((prev) => [...prev, { sender: 'ai', text: data.reply }]);
+      } else {
+        setMessages((prev) => [...prev, { sender: 'ai', text: '⚠️ Phản hồi hệ thống gặp lỗi, vui lòng thử lại sau.' }]);
+      }
+    } catch (error) {
+      setMessages((prev) => [...prev, { sender: 'ai', text: '🔌 Mất kết nối tới Backend AI (Kiểm tra cổng 8000).' }]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div style={{ position: 'fixed', bottom: '25px', right: '25px', zIndex: 1000, fontFamily: 'inherit' }}>
+      {/* Nút bong bóng chat phong cách Cyber/Neon */}
+      {!isOpen && (
+        <button
+          onClick={() => setIsOpen(true)}
+          style={{
+            padding: '14px 22px',
+            borderRadius: '35px',
+            background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)',
+            color: '#38bdf8',
+            border: '1px solid rgba(56, 189, 248, 0.4)',
+            cursor: 'pointer',
+            boxShadow: '0 0 25px rgba(56, 189, 248, 0.25)',
+            fontWeight: '600',
+            fontSize: '0.95rem',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            backdropFilter: 'blur(8px)'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateY(-3px) scale(1.02)';
+            e.currentTarget.style.boxShadow = '0 0 30px rgba(56, 189, 248, 0.45)';
+            e.currentTarget.style.borderColor = '#38bdf8';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0) scale(1)';
+            e.currentTarget.style.boxShadow = '0 0 25px rgba(56, 189, 248, 0.25)';
+            e.currentTarget.style.borderColor = 'rgba(56, 189, 248, 0.4)';
+          }}
+        >
+          <span style={{ position: 'relative', display: 'flex', height: '10px', width: '10px' }}>
+            <span style={{ position: 'absolute', display: 'inline-flex', height: '100%', width: '100%', borderRadius: '50%', backgroundColor: '#38bdf8', opacity: 0.75 }}></span>
+            <span style={{ position: 'relative', display: 'inline-flex', borderRadius: '50%', height: '10px', width: '10px', backgroundColor: '#0ea5e9' }}></span>
+          </span>
+          💬 AI Assistant 
+        </button>
+      )}
+
+      {/* Cửa sổ khung chat */}
+      {isOpen && (
+        <div style={{
+          width: '380px',
+          height: '520px',
+          backgroundColor: '#090d16',
+          color: '#f8fafc',
+          borderRadius: '18px',
+          boxShadow: '0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(56, 189, 248, 0.15)',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+          border: '1px solid rgba(56, 189, 248, 0.3)'
+        }}>
+          {/* Header */}
+          <div style={{
+            padding: '16px 18px',
+            backgroundColor: '#0f172a',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderBottom: '1px solid rgba(56, 189, 248, 0.15)'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '8px',
+                background: 'linear-gradient(135deg, #38bdf8, #6366f1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '16px',
+                boxShadow: '0 0 10px rgba(56, 189, 248, 0.5)'
+              }}>
+                
+              🥷
+              </div>
+              <div>
+                <div style={{ fontWeight: 'bold', fontSize: '0.95rem', letterSpacing: '0.5px', color: '#38bdf8' }}>
+                  Naruto đây !
+                </div>
+                <div style={{ fontSize: '0.7rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <span style={{ width: '6px', height: '6px', backgroundColor: '#22c55e', borderRadius: '50%' }}></span>
+                  Online (luôn sẵng sàn trả lời bạn)
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={() => setIsOpen(false)}
+              style={{
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                color: '#94a3b8',
+                cursor: 'pointer',
+                width: '28px',
+                height: '28px',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '14px',
+                transition: 'all 0.2s'
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.2)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = '#94a3b8'; e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)'; }}
+            >
+              ✕
+            </button>
+          </div>
+
+          {/* Vùng chứa tin nhắn */}
+          <div style={{
+            flex: 1,
+            padding: '16px',
+            overflowY: 'auto',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '12px',
+            backgroundColor: '#050811',
+            backgroundImage: 'radial-gradient(rgba(56, 189, 248, 0.03) 1px, transparent 0)',
+            backgroundSize: '20px 20px'
+          }}>
+            {messages.map((msg, index) => (
+              <div
+                key={index}
+                style={{
+                  alignSelf: msg.sender === 'user' ? 'flex-end' : 'flex-start',
+                  backgroundColor: msg.sender === 'user' ? '#0284c7' : '#111827',
+                  color: msg.sender === 'user' ? '#f8fafc' : '#e2e8f0',
+                  padding: '10px 14px',
+                  borderRadius: msg.sender === 'user' ? '14px 14px 2px 14px' : '14px 14px 14px 2px',
+                  maxWidth: '85%',
+                  fontSize: '0.9rem',
+                  lineHeight: '1.5',
+                  whiteSpace: 'pre-wrap',
+                  border: msg.sender === 'ai' ? '1px solid rgba(56, 189, 248, 0.15)' : 'none',
+                  boxShadow: msg.sender === 'user' ? '0 4px 12px rgba(2, 132, 199, 0.3)' : '0 2px 8px rgba(0, 0, 0, 0.4)'
+                }}
+              >
+                {msg.text}
+              </div>
+            ))}
+            {loading && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#38bdf8', fontSize: '0.85rem', fontStyle: 'italic', paddingLeft: '4px' }}>
+                ⚡ Đang xử lý dữ liệu...
+              </div>
+            )}
+          </div>
+
+          {/* Ô nhập tin nhắn */}
+          <div style={{
+            padding: '14px',
+            borderTop: '1px solid rgba(56, 189, 248, 0.15)',
+            display: 'flex',
+            gap: '8px',
+            backgroundColor: '#0f172a'
+          }}>
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+              placeholder="Nhập câu hỏi cho AI..."
+              style={{
+                flex: 1,
+                padding: '10px 14px',
+                borderRadius: '10px',
+                border: '1px solid rgba(56, 189, 248, 0.3)',
+                backgroundColor: '#050811',
+                color: '#fff',
+                outline: 'none',
+                fontSize: '0.9rem',
+                transition: 'border-color 0.2s'
+              }}
+              onFocus={(e) => e.currentTarget.style.borderColor = '#38bdf8'}
+              onBlur={(e) => e.currentTarget.style.borderColor = 'rgba(56, 189, 248, 0.3)'}
+            />
+            <button
+              onClick={handleSend}
+              style={{
+                padding: '10px 18px',
+                background: 'linear-gradient(135deg, #0ea5e9, #6366f1)',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '10px',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                fontSize: '0.9rem',
+                boxShadow: '0 0 15px rgba(14, 165, 233, 0.4)',
+                transition: 'opacity 0.2s'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.opacity = '0.9'}
+              onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+            >
+              Gửi
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ==========================================
+// MAIN APP COMPONENT
+// ==========================================
 export default function App() {
   const [activeTab, setActiveTab] = useState<'profile' | 'skills' | 'experience' | 'blog' | 'contact'>('profile');
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
@@ -431,6 +683,9 @@ export default function App() {
         >
           ↑
         </button>
+
+        {/* Nhúng Widget Trợ Lý AI */}
+        <AIChatWidget />
       </div>
     </div>
   );
