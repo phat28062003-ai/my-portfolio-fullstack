@@ -16,8 +16,8 @@ app.add_middleware(
 )
 
 # Đưa API Key vào biến môi trường để SDK Google GenAI tự động nhận diện chuẩn xác 100%
-os.environ["GEMINI_API_KEY"] 
-client = genai.Client()
+api_key = os.getenv("GEMINI_API_KEY")
+client = genai.Client(api_key=api_key)
 
 RESUME_CONTEXT = """
 Bạn là Trợ lý AI cá nhân đại diện cho Lũ Tiến Phát.
