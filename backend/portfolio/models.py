@@ -13,9 +13,6 @@ class Profile(models.Model):
     def __str__(self):
         return self.full_name
 
-    def __str__(self):
-        return self.full_name
-
 # 2. Dự án cá nhân
 class Project(models.Model):
     title = models.CharField(max_length=200)

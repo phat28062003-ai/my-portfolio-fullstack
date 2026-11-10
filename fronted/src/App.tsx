@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import confetti from 'canvas-confetti';
 import {
   getProfile, getProjects, getSkills,
@@ -21,6 +21,13 @@ function AIChatWidget() {
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages, loading, isOpen]);
 
   const handleSend = async () => {
     if (!input.trim() || loading) return;
@@ -31,7 +38,10 @@ function AIChatWidget() {
     setLoading(true);
 
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/ai-chat/', {
+      const chatApiUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+        ? 'http://127.0.0.1:8000/api/ai-chat/'
+        : 'https://Phatne.pythonanywhere.com/api/ai-chat/';
+      const res = await fetch(chatApiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: userMsg }),
@@ -135,7 +145,7 @@ function AIChatWidget() {
                 </div>
                 <div style={{ fontSize: '0.7rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <span style={{ width: '6px', height: '6px', backgroundColor: '#22c55e', borderRadius: '50%' }}></span>
-                  Online (luôn sẵng sàn trả lời bạn)
+                  Online (luôn sẵn sàng trả lời bạn)
                 </div>
               </div>
             </div>
@@ -199,6 +209,7 @@ function AIChatWidget() {
                 ⚡ Đang xử lý dữ liệu...
               </div>
             )}
+            <div ref={messagesEndRef} />
           </div>
 
           {/* Ô nhập tin nhắn */}
@@ -529,7 +540,7 @@ export default function App() {
               <div className="card" style={{ textAlign: 'center', marginTop: '10px' }}>
                 <h3 style={{ fontSize: '1.3rem', marginBottom: '15px', color: '#38bdf8' }}>📊 Hoạt Động GitHub</h3>
                 <img
-                  src="https://github-readme-stats.vercel.app/api?username=github&show_icons=true&theme=tokyonight&hide_border=true&bg_color=030712"
+                  src="https://github-readme-stats.vercel.app/api?username=phat28062003-ai&show_icons=true&theme=tokyonight&hide_border=true&bg_color=030712"
                   alt="GitHub Stats"
                   style={{ maxWidth: '100%', borderRadius: '12px' }}
                 />
