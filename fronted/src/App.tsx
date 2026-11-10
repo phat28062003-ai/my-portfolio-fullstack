@@ -292,9 +292,36 @@ export default function App() {
   const [showGithubWidget, setShowGithubWidget] = useState(true);
 
   useEffect(() => {
-    getProfile().then(setProfile).catch(() => {});
-    
-    // Dự án Todo Full-stack hiển thị cố định (Đã cập nhật đúng link demo của bạn)
+    // 1. Dữ liệu mặc định hiển thị ngay lập tức (không bị trống giao diện khi Backend đang ngủ/offline)
+    const defaultProfile = {
+      id: 1,
+      full_name: 'Lữ Tiến Phát',
+      title: 'Full-stack Developer & AI Engineer Aspirant',
+      bio: 'Đam mê xây dựng các ứng dụng web tối ưu và tích hợp AI vào sản phẩm thực tế.',
+      email: 'phat28062003@gmail.com',
+      github: 'https://github.com/phat28062003-ai',
+      location: 'Mỹ Tho, Việt Nam',
+      avatar: ''
+    };
+
+    const defaultSkills = [
+      { id: 1, name: 'Python / Django REST Framework', proficiency: 90, category: 'Backend' },
+      { id: 2, name: 'JavaScript / TypeScript / React', proficiency: 85, category: 'Frontend' },
+      { id: 3, name: 'FastAPI & Gemini AI Integration', proficiency: 80, category: 'AI / Backend' },
+      { id: 4, name: 'PostgreSQL & SQLite', proficiency: 80, category: 'Database' },
+      { id: 5, name: 'Git & Deployment (Vercel, PythonAnywhere)', proficiency: 75, category: 'DevOps' }
+    ];
+
+    const defaultExperiences = [
+      {
+        id: 1,
+        role: 'Full-stack Developer',
+        company: 'Personal Projects',
+        period: '2023 - Present',
+        description: 'Phát triển các ứng dụng Full-stack với Django REST Framework, React/TypeScript và Gemini AI.'
+      }
+    ];
+
     const todoAppProject = {
       id: 'todo-fullstack-fixed',
       title: 'Full-stack Todo Application',
@@ -304,14 +331,22 @@ export default function App() {
       demo: 'https://todo-frontend-tawny-iota.vercel.app/#/'
     };
 
-    // Đặt mặc định dự án Todo ngay từ đầu
+    // Đặt dữ liệu mặc định ngay từ đầu
+    setProfile(defaultProfile);
+    setSkills(defaultSkills);
+    setExperiences(defaultExperiences);
     setProjects([todoAppProject]);
 
-    // Gọi API lấy thêm danh sách từ backend (nếu backend hoạt động)
+    // Gọi API nạp dữ liệu động từ backend nếu backend đang hoạt động
+    getProfile()
+      .then((data) => {
+        if (data) setProfile(data);
+      })
+      .catch(() => {});
+
     getProjects()
       .then((apiProjects) => {
         if (Array.isArray(apiProjects) && apiProjects.length > 0) {
-          // Lọc trùng nếu backend đã có dự án này
           const otherProjects = apiProjects.filter((p: any) => p.title !== todoAppProject.title);
           setProjects([todoAppProject, ...otherProjects]);
         }
@@ -320,8 +355,18 @@ export default function App() {
         console.warn("Backend API offline/error, keeping default projects:", err);
       });
 
-    getSkills().then(setSkills).catch(() => {});
-    getExperiences().then(setExperiences).catch(() => {});
+    getSkills()
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) setSkills(data);
+      })
+      .catch(() => {});
+
+    getExperiences()
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) setExperiences(data);
+      })
+      .catch(() => {});
+
     getBlogPosts().then(setBlogs).catch(() => {});
 
     const handleScroll = () => {
