@@ -266,6 +266,15 @@ function AIChatWidget() {
   );
 }
 
+// Helper xử lý đường dẫn ảnh (hỗ trợ ảnh local tĩnh đóng gói sẵn và link online)
+const getMediaUrl = (path?: string) => {
+  if (!path) return '';
+  if (path.startsWith('http://') || path.startsWith('https://')) return path;
+  const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+  const baseUrl = import.meta.env.BASE_URL || '/';
+  return `${baseUrl}media/${cleanPath}`;
+};
+
 // ==========================================
 // MAIN APP COMPONENT
 // ==========================================
@@ -297,11 +306,11 @@ export default function App() {
       id: 1,
       full_name: 'Lữ Tiến Phát',
       title: 'Full-stack Developer & AI Engineer Aspirant',
-      bio: 'Đam mê xây dựng các ứng dụng web tối ưu và tích hợp AI vào sản phẩm thực tế.',
+      bio: 'Chào bạn, mình là Lữ Tiến Phát, một lập trình viên Full-stack trẻ tuổi và đầy nhiệt huyết. Mình có thế mạnh trong việc xây dựng các ứng dụng web hiện đại, kết hợp mạnh mẽ giữa Django Backend và Vite/TypeScript Frontend. Mình luôn tò mò học hỏi công nghệ mới và tập trung tạo ra những sản phẩm có trải nghiệm mượt mà, tối ưu.',
       email: 'phat28062003@gmail.com',
       github: 'https://github.com/phat28062003-ai',
       location: 'Mỹ Tho, Việt Nam',
-      avatar: ''
+      avatar: 'profiles/p.jpg'
     };
 
     const defaultSkills = [
@@ -322,6 +331,27 @@ export default function App() {
       }
     ];
 
+    const defaultBlogs = [
+      {
+        id: 1,
+        title: 'Hôm nay ngày 30/10',
+        summary: 'Học đọc kiến thức mới',
+        content: 'Hôm nay học đọc thêm nhiều kiến thức mới về Django, React và tích hợp AI. Từng bước hoàn thiện dự án fullstack và nâng cấp giao diện phong cách cyberpunk.',
+        image: 'blog_images/images_lKvqlr2.jfif',
+        image_caption: 'Giao diện & hệ thống',
+        created_at: '2026-10-30T04:40:15Z'
+      },
+      {
+        id: 2,
+        title: 'Dog',
+        summary: 'So cute',
+        content: 'Chú cún cưng siêu đáng yêu! Khoảnh khắc thư giãn tuyệt vời sau những giờ lập trình căng thẳng.',
+        image: 'blog_images/download_1.jfif',
+        image_caption: 'Cute dog',
+        created_at: '2026-10-30T04:48:40Z'
+      }
+    ];
+
     const todoAppProject = {
       id: 'todo-fullstack-fixed',
       title: 'Full-stack Todo Application',
@@ -335,6 +365,7 @@ export default function App() {
     setProfile(defaultProfile);
     setSkills(defaultSkills);
     setExperiences(defaultExperiences);
+    setBlogs(defaultBlogs);
     setProjects([todoAppProject]);
 
     // Gọi API nạp dữ liệu động từ backend nếu backend đang hoạt động
@@ -367,7 +398,11 @@ export default function App() {
       })
       .catch(() => {});
 
-    getBlogPosts().then(setBlogs).catch(() => {});
+    getBlogPosts()
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) setBlogs(data);
+      })
+      .catch(() => {});
 
     const handleScroll = () => {
       if (window.scrollY > 300) {
@@ -487,7 +522,7 @@ export default function App() {
               <div className="card" style={{ textAlign: 'center', padding: '50px 30px' }}>
                 {profile.avatar && (
                   <img
-                    src={profile.avatar.startsWith('http') ? profile.avatar : `https://Phatne.pythonanywhere.com${profile.avatar.startsWith('/') ? '' : '/'}${profile.avatar}`}
+                    src={getMediaUrl(profile.avatar)}
                     alt={profile.full_name}
                     style={{
                       width: '130px',
@@ -654,11 +689,7 @@ export default function App() {
                   {b.image && (
                     <div style={{ marginTop: '12px' }}>
                       <img
-                        src={
-                          b.image.startsWith('http')
-                            ? b.image
-                            : `https://Phatne.pythonanywhere.com${b.image.startsWith('/') ? '' : '/'}${b.image}`
-                        }
+                        src={getMediaUrl(b.image)}
                         alt={b.title}
                         className="blog-img"
                         style={{ maxWidth: '100%', borderRadius: '8px' }}

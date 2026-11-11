@@ -141,9 +141,49 @@ async def get_experience():
         "description": "Phát triển các ứng dụng Full-stack với Django REST Framework, React/TypeScript và Gemini AI."
     }]
 
+import sqlite3
+from fastapi.staticfiles import StaticFiles
+
+# Phục vụ thư mục ảnh media nếu tồn tại
+media_dir = BASE_DIR / "media"
+if media_dir.exists():
+    app.mount("/media", StaticFiles(directory=str(media_dir)), name="media")
+
 @app.get("/api/blogs/")
 async def get_blogs():
-    return []
+    db_path = BASE_DIR / "db.sqlite3"
+    if db_path.exists():
+        try:
+            conn = sqlite3.connect(str(db_path))
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
+            rows = cursor.execute("SELECT id, title, summary, content, image, image_caption, created_at FROM portfolio_blogpost ORDER BY created_at DESC").fetchall()
+            conn.close()
+            if rows:
+                return [dict(r) for r in rows]
+        except Exception as e:
+            traceback.print_exc()
+
+    return [
+        {
+            "id": 1,
+            "title": "Hôm nay ngày 30/10",
+            "summary": "Học đọc kiến thức mới",
+            "content": "Hôm nay học đọc thêm nhiều kiến thức mới về Django, React và tích hợp AI. Từng bước hoàn thiện dự án fullstack và nâng cấp giao diện phong cách cyberpunk.",
+            "image": "blog_images/images_lKvqlr2.jfif",
+            "image_caption": "Giao diện & hệ thống",
+            "created_at": "2026-10-30T04:40:15Z"
+        },
+        {
+            "id": 2,
+            "title": "Dog",
+            "summary": "So cute",
+            "content": "Chú cún cưng siêu đáng yêu! Khoảnh khắc thư giãn tuyệt vời sau những giờ lập trình căng thẳng.",
+            "image": "blog_images/download_1.jfif",
+            "image_caption": "Cute dog",
+            "created_at": "2026-10-30T04:48:40Z"
+        }
+    ]
 
 @app.post("/api/contacts/")
 async def create_contact(request: ContactMessageRequest):
