@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import confetti from 'canvas-confetti';
 import {
   getProfile, getProjects, getSkills,
-  getExperiences, getBlogPosts
+  getExperiences, getBlogPosts, sendAIChatMessage
 } from './api';
 import './style.css';
 
@@ -38,23 +38,16 @@ function AIChatWidget() {
     setLoading(true);
 
     try {
-      const chatApiUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-        ? 'http://127.0.0.1:8000/api/ai-chat/'
-        : 'https://Phatne.pythonanywhere.com/api/ai-chat/';
-      const res = await fetch(chatApiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userMsg }),
-      });
-      const data = await res.json();
-      
-      if (res.ok) {
+      // Gọi trực tiếp hàm thông minh tập trung từ api.ts
+      const data = await sendAIChatMessage(userMsg);
+
+      if (data && data.reply) {
         setMessages((prev) => [...prev, { sender: 'ai', text: data.reply }]);
       } else {
         setMessages((prev) => [...prev, { sender: 'ai', text: '⚠️ Phản hồi hệ thống gặp lỗi, vui lòng thử lại sau.' }]);
       }
     } catch (error) {
-      setMessages((prev) => [...prev, { sender: 'ai', text: '🔌 Mất kết nối tới Backend AI (Kiểm tra cổng 8000).' }]);
+      setMessages((prev) => [...prev, { sender: 'ai', text: '🔌 Mất kết nối tới Backend AI.' }]);
     } finally {
       setLoading(false);
     }
@@ -97,7 +90,7 @@ function AIChatWidget() {
             <span style={{ position: 'absolute', display: 'inline-flex', height: '100%', width: '100%', borderRadius: '50%', backgroundColor: '#38bdf8', opacity: 0.75 }}></span>
             <span style={{ position: 'relative', display: 'inline-flex', borderRadius: '50%', height: '10px', width: '10px', backgroundColor: '#0ea5e9' }}></span>
           </span>
-          💬 AI Assistant 
+          💬 AI Assistant
         </button>
       )}
 
@@ -136,8 +129,7 @@ function AIChatWidget() {
                 fontSize: '16px',
                 boxShadow: '0 0 10px rgba(56, 189, 248, 0.5)'
               }}>
-                
-              🥷
+                🥷
               </div>
               <div>
                 <div style={{ fontWeight: 'bold', fontSize: '0.95rem', letterSpacing: '0.5px', color: '#38bdf8' }}>
@@ -266,7 +258,7 @@ function AIChatWidget() {
   );
 }
 
-// Helper xử lý đường dẫn ảnh (hỗ trợ ảnh local tĩnh đóng gói sẵn và link online)
+// Helper xử lý đường dẫn ảnh
 const getMediaUrl = (path?: string) => {
   if (!path) return '';
   if (path.startsWith('http://') || path.startsWith('https://')) return path;
@@ -292,16 +284,13 @@ export default function App() {
   const [typedTitle, setTypedTitle] = useState('');
   const [showScrollTop, setShowScrollTop] = useState(false);
 
-  // Formspree state (Sử dụng đúng endpoint của bạn)
   const [contactForm, setContactForm] = useState({ name: '', email: '', message: '' });
   const [statusMsg, setStatusMsg] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // State để ẩn/hiện widget GitHub tạm thời khi bị lỗi 503
   const [showGithubWidget, setShowGithubWidget] = useState(true);
 
   useEffect(() => {
-    // 1. Dữ liệu mặc định hiển thị ngay lập tức (không bị trống giao diện khi Backend đang ngủ/offline)
     const defaultProfile = {
       id: 1,
       full_name: 'Lữ Tiến Phát',
@@ -361,48 +350,22 @@ export default function App() {
       demo: 'https://todo-frontend-tawny-iota.vercel.app/#/'
     };
 
-    // Đặt dữ liệu mặc định ngay từ đầu
     setProfile(defaultProfile);
     setSkills(defaultSkills);
     setExperiences(defaultExperiences);
     setBlogs(defaultBlogs);
     setProjects([todoAppProject]);
 
-    // Gọi API nạp dữ liệu động từ backend nếu backend đang hoạt động
-    getProfile()
-      .then((data) => {
-        if (data) setProfile(data);
-      })
-      .catch(() => {});
-
-    getProjects()
-      .then((apiProjects) => {
-        if (Array.isArray(apiProjects) && apiProjects.length > 0) {
-          const otherProjects = apiProjects.filter((p: any) => p.title !== todoAppProject.title);
-          setProjects([todoAppProject, ...otherProjects]);
-        }
-      })
-      .catch((err) => {
-        console.warn("Backend API offline/error, keeping default projects:", err);
-      });
-
-    getSkills()
-      .then((data) => {
-        if (Array.isArray(data) && data.length > 0) setSkills(data);
-      })
-      .catch(() => {});
-
-    getExperiences()
-      .then((data) => {
-        if (Array.isArray(data) && data.length > 0) setExperiences(data);
-      })
-      .catch(() => {});
-
-    getBlogPosts()
-      .then((data) => {
-        if (Array.isArray(data) && data.length > 0) setBlogs(data);
-      })
-      .catch(() => {});
+    getProfile().then((data) => { if (data) setProfile(data); }).catch(() => { });
+    getProjects().then((apiProjects) => {
+      if (Array.isArray(apiProjects) && apiProjects.length > 0) {
+        const otherProjects = apiProjects.filter((p: any) => p.title !== todoAppProject.title);
+        setProjects([todoAppProject, ...otherProjects]);
+      }
+    }).catch(() => { });
+    getSkills().then((data) => { if (Array.isArray(data) && data.length > 0) setSkills(data); }).catch(() => { });
+    getExperiences().then((data) => { if (Array.isArray(data) && data.length > 0) setExperiences(data); }).catch(() => { });
+    getBlogPosts().then((data) => { if (Array.isArray(data) && data.length > 0) setBlogs(data); }).catch(() => { });
 
     const handleScroll = () => {
       if (window.scrollY > 300) {
@@ -415,7 +378,6 @@ export default function App() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Hiệu ứng gõ chữ tiêu đề mượt mà
   useEffect(() => {
     const fullText = profile?.title || 'Full-stack Developer | Python & TypeScript Enthusiast';
     let index = 0;
@@ -431,7 +393,6 @@ export default function App() {
     return () => clearInterval(timer);
   }, [profile]);
 
-  // Chuyển đổi Dark / Light Theme
   const toggleTheme = () => {
     const nextTheme = theme === 'dark' ? 'light' : 'dark';
     setTheme(nextTheme);
@@ -442,7 +403,6 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Tích hợp gửi tin nhắn qua Formspree để nhận thông báo về email
   const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!contactForm.name || !contactForm.email || !contactForm.message) return;
@@ -465,11 +425,7 @@ export default function App() {
       });
 
       if (response.ok) {
-        confetti({
-          particleCount: 120,
-          spread: 70,
-          origin: { y: 0.6 }
-        });
+        confetti({ particleCount: 120, spread: 70, origin: { y: 0.6 } });
         setStatusMsg('🚀 Tuyệt vời! Tin nhắn của bạn đã được gửi thành công và chuyển đến email của tôi.');
         setContactForm({ name: '', email: '', message: '' });
       } else {
@@ -489,7 +445,6 @@ export default function App() {
 
   return (
     <div>
-      {/* Thanh Menu Nổi Kính Mờ & Nút Đổi Theme */}
       <nav className="navbar">
         {(['profile', 'skills', 'experience', 'blog', 'contact'] as const).map((tab) => (
           <button
@@ -515,7 +470,6 @@ export default function App() {
       </nav>
 
       <div className="container">
-        {/* TAB PROFILE & PROJECTS */}
         {activeTab === 'profile' && (
           <div className="tab-content">
             {profile && (
@@ -550,7 +504,6 @@ export default function App() {
                 <span>🚀</span> Các Dự Án Nổi Bật
               </h2>
 
-              {/* Bộ Lọc công nghệ */}
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                 {technologies.map((tech) => (
                   <button
@@ -579,12 +532,12 @@ export default function App() {
                 <div key={p.id} className="card" style={{ position: 'relative' }}>
                   <h3 style={{ fontSize: '1.4rem', marginBottom: '10px', color: '#38bdf8' }}>{p.title}</h3>
                   <p style={{ color: 'var(--text-muted)', lineHeight: '1.6', marginBottom: '15px' }}>{p.description}</p>
-                  
+
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
                     <span style={{ background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8', padding: '6px 14px', borderRadius: '20px', fontSize: '0.82rem', fontWeight: 600 }}>
                       🛠 {p.technology}
                     </span>
-                    
+
                     <div style={{ display: 'flex', gap: '12px' }}>
                       {p.github && (
                         <a href={p.github} target="_blank" rel="noreferrer" style={{ color: '#38bdf8', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 600 }}>
@@ -606,7 +559,6 @@ export default function App() {
               </div>
             )}
 
-            {/* Nút bật/tắt tạm thời Widget Thống kê GitHub */}
             <div style={{ textAlign: 'right', marginTop: '20px' }}>
               <button
                 onClick={() => setShowGithubWidget(!showGithubWidget)}
@@ -629,7 +581,6 @@ export default function App() {
           </div>
         )}
 
-        {/* TAB SKILLS */}
         {activeTab === 'skills' && (
           <div className="tab-content card">
             <h2 style={{ fontSize: '1.8rem', marginBottom: '8px', color: 'var(--text-main)' }}>⚡ Kỹ Năng Lập Trình</h2>
@@ -652,7 +603,6 @@ export default function App() {
           </div>
         )}
 
-        {/* TAB EXPERIENCE */}
         {activeTab === 'experience' && (
           <div className="tab-content">
             <h2 style={{ fontSize: '1.8rem', marginBottom: '25px', color: 'var(--text-main)' }}>💼 Quá Trình & Kinh Nghiệm</h2>
@@ -677,7 +627,6 @@ export default function App() {
           </div>
         )}
 
-        {/* TAB BLOG */}
         {activeTab === 'blog' && (
           <div className="tab-content">
             <h2 style={{ fontSize: '1.8rem', marginBottom: '25px', color: 'var(--text-main)' }}>📝 Nhật Ký & Bài Viết Cá Nhân</h2>
@@ -702,13 +651,12 @@ export default function App() {
               ))
             ) : (
               <div className="card" style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
-                <p>Chưa có bài viết nhật ký nào. Truy cập <a href="https://Phatne.pythonanywhere.com/admin/" target="_blank" rel="noreferrer" style={{ color: '#38bdf8', textDecoration: 'underline' }}>Django Admin</a> để thêm bài viết mới.</p>
+                <p>Chưa có bài viết nhật ký nào. Truy cập <a href="https://phatne.pythonanywhere.com/admin/" target="_blank" rel="noreferrer" style={{ color: '#38bdf8', textDecoration: 'underline' }}>Django Admin</a> để thêm bài viết mới.</p>
               </div>
             )}
           </div>
         )}
 
-        {/* TAB CONTACT */}
         {activeTab === 'contact' && (
           <div className="tab-content card">
             <h2 style={{ fontSize: '1.8rem', marginBottom: '10px', color: 'var(--text-main)' }}>📬 Hộp Thư Liên Hệ</h2>
@@ -762,7 +710,6 @@ export default function App() {
           </div>
         )}
 
-        {/* Nút Cuộn Về Đầu Trang (Scroll to Top) */}
         <button
           className={`scroll-to-top ${showScrollTop ? 'show' : ''}`}
           onClick={scrollToTop}
@@ -771,7 +718,6 @@ export default function App() {
           ↑
         </button>
 
-        {/* Nhúng Widget Trợ Lý AI */}
         <AIChatWidget />
       </div>
     </div>

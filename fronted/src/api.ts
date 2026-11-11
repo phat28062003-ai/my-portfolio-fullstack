@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://Phatne.pythonanywhere.com/api';
+const API_BASE_URL = 'https://phatne.pythonanywhere.com/api';
 
 export interface Profile {
   id: number;
@@ -119,5 +119,24 @@ export const sendContactMessage = async (messageData: ContactMessage) => {
   } catch (error) {
     console.error("Lỗi khi gửi tin nhắn:", error);
     return null;
+  }
+};
+
+// 7. Gửi tin nhắn tới trợ lý AI (Tự động nhận diện local hay server online)
+export const sendAIChatMessage = async (message: string) => {
+  const url = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? 'http://127.0.0.1:8000/api/ai-chat/'
+    : `${API_BASE_URL}/ai-chat/`;
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message }),
+    });
+    return await response.json();
+  } catch (error) {
+    console.error("Lỗi khi kết nối AI chat:", error);
+    return { reply: "🔌 Mất kết nối tới Backend AI." };
   }
 };
