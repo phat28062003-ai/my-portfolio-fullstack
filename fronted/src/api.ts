@@ -7,6 +7,8 @@ export interface Profile {
   bio: string;
   github?: string;
   email: string;
+  location?: string;
+  avatar?: string;
 }
 
 export interface Project {

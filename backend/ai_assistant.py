@@ -96,7 +96,7 @@ async def get_profile():
         "email": "phat28062003@gmail.com",
         "github": "https://github.com/phat28062003-ai",
         "location": "Mỹ Tho, Việt Nam",
-        "avatar": ""
+        "avatar": "profiles/p.jpg"
     }]
 
 @app.get("/api/projects/")

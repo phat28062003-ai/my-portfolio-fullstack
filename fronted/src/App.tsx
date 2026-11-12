@@ -356,7 +356,14 @@ export default function App() {
     setBlogs(defaultBlogs);
     setProjects([todoAppProject]);
 
-    getProfile().then((data) => { if (data) setProfile(data); }).catch(() => { });
+    getProfile().then((data) => {
+      if (data) {
+        setProfile({
+          ...data,
+          avatar: data.avatar || 'profiles/p.jpg'
+        });
+      }
+    }).catch(() => { });
     getProjects().then((apiProjects) => {
       if (Array.isArray(apiProjects) && apiProjects.length > 0) {
         const otherProjects = apiProjects.filter((p: any) => p.title !== todoAppProject.title);
@@ -474,21 +481,19 @@ export default function App() {
           <div className="tab-content">
             {profile && (
               <div className="card" style={{ textAlign: 'center', padding: '50px 30px' }}>
-                {profile.avatar && (
-                  <img
-                    src={getMediaUrl(profile.avatar)}
-                    alt={profile.full_name}
-                    style={{
-                      width: '130px',
-                      height: '130px',
-                      borderRadius: '50%',
-                      objectFit: 'cover',
-                      border: '3px solid #38bdf8',
-                      boxShadow: '0 0 25px rgba(56, 189, 248, 0.4)',
-                      marginBottom: '20px'
-                    }}
-                  />
-                )}
+                <img
+                  src={getMediaUrl(profile.avatar || 'profiles/p.jpg')}
+                  alt={profile.full_name || 'Lữ Tiến Phát'}
+                  style={{
+                    width: '130px',
+                    height: '130px',
+                    borderRadius: '50%',
+                    objectFit: 'cover',
+                    border: '3px solid #38bdf8',
+                    boxShadow: '0 0 25px rgba(56, 189, 248, 0.4)',
+                    marginBottom: '20px'
+                  }}
+                />
                 <h1 className="profile-title">{profile.full_name}</h1>
                 <p style={{ color: '#c084fc', fontSize: '1.2rem', margin: '15px 0', fontWeight: 600, minHeight: '30px' }}>
                   {typedTitle}<span style={{ opacity: 0.7, animation: 'blink 1s infinite' }}>|</span>
