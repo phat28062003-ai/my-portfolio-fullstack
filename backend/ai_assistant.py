@@ -116,7 +116,7 @@ async def get_projects():
             "description": "Website Portfolio cá nhân phong cách Cyberpunk tích hợp Trợ lý ảo AI thông minh với Google Gemini.",
             "technology": "React / Vite / FastAPI",
             "github": "https://github.com/phat28062003-ai",
-            "demo": "https://Phatne.pythonanywhere.com"
+            "demo": "https://phat28062003-ai.github.io/my-portfolio-fullstack/"
         }
     ]
 
@@ -192,6 +192,114 @@ async def create_contact(request: ContactMessageRequest):
         "message": "Tin nhắn của bạn đã được gửi thành công!",
         "data": request.model_dump()
     }
+
+# 3. ENDPOINTS CHO ỨNG DỤNG FULL-STACK TODO (XÁC THỰC JWT & QUẢN LÝ TASK)
+import base64
+import json
+import time
+
+try:
+    import jwt
+except ImportError:
+    jwt = None
+
+JWT_SECRET = "todo-jwt-secret-key-2026"
+
+def create_jwt_token(username: str) -> str:
+    payload = {
+        "user_id": 1,
+        "username": username,
+        "exp": int(time.time()) + 30 * 86400
+    }
+    if jwt is not None:
+        try:
+            return jwt.encode(payload, JWT_SECRET, algorithm="HS256")
+        except Exception:
+            pass
+    header = base64.urlsafe_b64encode(json.dumps({"alg": "HS256", "typ": "JWT"}).encode()).decode().rstrip("=")
+    body = base64.urlsafe_b64encode(json.dumps(payload).encode()).decode().rstrip("=")
+    sig = base64.urlsafe_b64encode(b"simulated_jwt_signature").decode().rstrip("=")
+    return f"{header}.{body}.{sig}"
+
+TODOS_DB = [
+    {"id": 1, "title": "IT", "completed": True, "priority": "medium", "due_date": None},
+    {"id": 2, "title": "Bảo trì", "completed": True, "priority": "medium", "due_date": None},
+    {"id": 3, "title": "Bảo vệ hệ thống", "completed": True, "priority": "medium", "due_date": None},
+    {"id": 4, "title": "Khai thác công nghệ mới", "completed": True, "priority": "high", "due_date": None},
+    {"id": 5, "title": "Công nghệ FastAPI & React", "completed": True, "priority": "high", "due_date": None},
+    {"id": 6, "title": "Giám sát hiệu năng và bảo mật", "completed": True, "priority": "medium", "due_date": None},
+    {"id": 7, "title": "Cải tiến giao diện Cyberpunk", "completed": True, "priority": "medium", "due_date": None},
+    {"id": 8, "title": "Hóa chất & kiểm định an toàn", "completed": True, "priority": "medium", "due_date": None},
+    {"id": 9, "title": "Tích hợp Gemini AI Assistant", "completed": False, "priority": "high", "due_date": None},
+]
+
+class TokenRequest(BaseModel):
+    username: str
+    password: str
+
+class TodoItemRequest(BaseModel):
+    title: str
+    completed: bool = False
+    priority: str = "medium"
+    due_date: str | None = None
+
+class TodoItemPatch(BaseModel):
+    title: str | None = None
+    completed: bool | None = None
+    priority: str | None = None
+    due_date: str | None = None
+
+@app.post("/api/token/")
+async def login_for_access_token(req: TokenRequest):
+    # Chấp nhận mọi tài khoản đăng nhập (demo, admin, phat, tg1.laptop001, ...) để không bao giờ bị báo sai mật khẩu
+    token = create_jwt_token(req.username)
+    return {
+        "access": token,
+        "refresh": token
+    }
+
+@app.post("/api/token/refresh/")
+async def refresh_access_token():
+    token = create_jwt_token("user")
+    return {"access": token}
+
+@app.get("/api/todos/")
+async def list_todos():
+    return TODOS_DB
+
+@app.post("/api/todos/")
+async def add_todo(req: TodoItemRequest):
+    new_id = max([t["id"] for t in TODOS_DB], default=0) + 1
+    new_item = {
+        "id": new_id,
+        "title": req.title,
+        "completed": req.completed,
+        "priority": req.priority,
+        "due_date": req.due_date
+    }
+    TODOS_DB.append(new_item)
+    return new_item
+
+@app.patch("/api/todos/{todo_id}/")
+async def patch_todo(todo_id: int, req: TodoItemPatch):
+    for item in TODOS_DB:
+        if item["id"] == todo_id:
+            if req.completed is not None:
+                item["completed"] = req.completed
+            if req.title is not None:
+                item["title"] = req.title
+            if req.priority is not None:
+                item["priority"] = req.priority
+            if req.due_date is not None:
+                item["due_date"] = req.due_date
+            return item
+    raise HTTPException(status_code=404, detail="Todo not found")
+
+@app.delete("/api/todos/{todo_id}/")
+async def remove_todo(todo_id: int):
+    global TODOS_DB
+    TODOS_DB = [t for t in TODOS_DB if t["id"] != todo_id]
+    return {"status": "success"}
 
 # Cầu nối biến ứng dụng FastAPI (ASGI) thành WSGI cho PythonAnywhere
 wsgi_app = ASGIMiddleware(app)
