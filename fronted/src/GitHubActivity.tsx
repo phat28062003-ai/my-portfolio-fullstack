@@ -688,3 +688,4 @@ export const GitHubActivity: React.FC = () => {
     </div>
   );
 };
+
