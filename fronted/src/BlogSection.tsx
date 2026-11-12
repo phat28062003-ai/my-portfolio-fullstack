@@ -349,3 +349,4 @@ export const BlogSection: React.FC<BlogSectionProps> = ({ getMediaUrl }) => {
     </div>
   );
 };
+

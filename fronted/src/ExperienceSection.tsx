@@ -16,10 +16,10 @@ export const ExperienceSection: React.FC = () => {
   const experiences: ExperienceItem[] = [
     {
       id: 1,
-      period: '2024 - HIỆN TẠI',
+      period: '2025 - HIỆN TẠI',
       role: 'Full-stack Developer & AI Engineer Aspirant',
       company: 'Personal Projects & Open-Source Research',
-      location: 'Mỹ Tho, Việt Nam (Remote)',
+      location: 'Mỹ Tho, Việt Nam ',
       badge: 'Chủ Lực • Active',
       badgeColor: '#38bdf8',
       highlights: [
@@ -32,7 +32,7 @@ export const ExperienceSection: React.FC = () => {
     },
     {
       id: 2,
-      period: '2023 - 2024',
+      period: '2025 - 2026',
       role: 'Full-stack Web Developer',
       company: 'Todo Application & Web Solutions',
       location: 'Việt Nam',
@@ -48,11 +48,11 @@ export const ExperienceSection: React.FC = () => {
     },
     {
       id: 3,
-      period: '2021 - 2025 (DỰ KIẾN)',
-      role: 'Sinh Viên Ngành Công Nghệ Thông Tin',
-      company: 'Đại Học / Học Viện CNTT',
+      period: '2026  (DỰ KIẾN)',
+      role: 'Học chuyên sâu về kỹ năng lập trình cũng như cách dùng AI vào công việc',
+      company: 'Simone ',
       location: 'Việt Nam',
-      badge: 'Đào Tạo Chính Quy',
+      badge: 'Đang thực hiện ',
       badgeColor: '#c084fc',
       highlights: [
         'Nghiên cứu nền tảng vững chắc về Cấu trúc dữ liệu & Giải thuật, Lập trình Hướng đối tượng (OOP), và Kiến trúc phần mềm.',
@@ -212,3 +212,4 @@ export const ExperienceSection: React.FC = () => {
     </div>
   );
 };
+

@@ -160,3 +160,4 @@ export const ParticleBackground: React.FC<ParticleBackgroundProps> = ({ theme })
     />
   );
 };
+

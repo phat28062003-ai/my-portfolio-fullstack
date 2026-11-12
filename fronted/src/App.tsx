@@ -27,7 +27,7 @@ const getMediaUrl = (path?: string) => {
 // ==========================================
 export default function App() {
   const [activeTab, setActiveTab] = useState<'profile' | 'skills' | 'experience' | 'blog' | 'contact'>('profile');
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const [theme, setTheme] = useState<'dark' | 'light'>('light');
 
   const [profile, setProfile] = useState<any>(null);
   const [projects, setProjects] = useState<any[]>([]);
@@ -41,6 +41,7 @@ export default function App() {
   const [showGithubWidget, setShowGithubWidget] = useState(true);
 
   useEffect(() => {
+    document.documentElement.setAttribute('data-theme', 'light');
     const defaultProfile = {
       id: 1,
       full_name: 'Lữ Tiến Phát',
@@ -158,13 +159,22 @@ export default function App() {
           <div className="tab-content">
             {profile && (
               <div className="card animated-card-hover" style={{ textAlign: 'center', padding: '50px 30px' }}>
-                <div className="avatar-wrapper">
+                <div className="avatar-wrapper" title="Lữ Tiến Phát • Verified Full-stack Developer">
+                  <div className="avatar-hud-ring-outer"></div>
                   <div className="avatar-neon-ring"></div>
-                  <img
-                    src={getMediaUrl(profile.avatar || 'profiles/p.jpg')}
-                    alt={profile.full_name || 'Lữ Tiến Phát'}
-                    className="avatar-img"
-                  />
+                  <div className="avatar-inner-ring"></div>
+                  <div className="avatar-img-container">
+                    <div className="avatar-scanner-line"></div>
+                    <img
+                      src={getMediaUrl(profile.avatar || 'profiles/p.jpg')}
+                      alt={profile.full_name || 'Lữ Tiến Phát'}
+                      className="avatar-img"
+                    />
+                  </div>
+                  <div className="avatar-tech-badge">
+                    <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981', boxShadow: '0 0 8px #10b981', animation: 'pulse 1.5s infinite' }}></span>
+                    <span>SYS.ONLINE • DEV</span>
+                  </div>
                 </div>
                 <h1 className="profile-title">{profile.full_name}</h1>
                 <p style={{ color: '#c084fc', fontSize: '1.2rem', margin: '15px 0', fontWeight: 600, minHeight: '30px' }}>
