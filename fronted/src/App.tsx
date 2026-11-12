@@ -7,6 +7,7 @@ import {
 import { GitHubActivity } from './GitHubActivity';
 import { AIChatWidget } from './AIChatWidget';
 import { ParticleBackground } from './ParticleBackground';
+import { SkillsSection } from './SkillsSection';
 import './style.css';
 
 // Helper xử lý đường dẫn ảnh
@@ -324,27 +325,7 @@ export default function App() {
           </div>
         )}
 
-        {activeTab === 'skills' && (
-          <div className="tab-content card">
-            <h2 style={{ fontSize: '1.8rem', marginBottom: '8px', color: 'var(--text-main)' }}>⚡ Kỹ Năng Lập Trình</h2>
-            <p style={{ color: 'var(--text-muted)', marginBottom: '30px' }}>Mức độ thành thạo các công nghệ chuyên môn.</p>
-            {skills.length > 0 ? (
-              skills.map((s) => (
-                <div key={s.id} className="skill-item">
-                  <div className="skill-info">
-                    <span>{s.name}</span>
-                    <span style={{ color: '#38bdf8' }}>{s.proficiency}%</span>
-                  </div>
-                  <div className="progress-bg">
-                    <div className="progress-fill" style={{ width: `${s.proficiency}%` }}></div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p style={{ color: 'var(--text-muted)' }}>Chưa có kỹ năng nào.</p>
-            )}
-          </div>
-        )}
+        {activeTab === 'skills' && <SkillsSection skills={skills} />}
 
         {activeTab === 'experience' && (
           <div className="tab-content">
