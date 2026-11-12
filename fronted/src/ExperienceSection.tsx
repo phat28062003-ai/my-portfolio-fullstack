@@ -17,7 +17,7 @@ export const ExperienceSection: React.FC = () => {
     {
       id: 1,
       period: '2025 - HIỆN TẠI',
-      role: 'Full-stack Developer & AI Engineer Aspirant',
+      role: 'học và nghiên cứu lập trình Full-Stack và Trí Tuệ Nhân Tạo',
       company: 'Personal Projects & Open-Source Research',
       location: 'Mỹ Tho, Việt Nam ',
       badge: 'Chủ Lực • Active',
