@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://phatne.pythonanywhere.com/api';
+const API_BASE_URL = 'https://my-portfolio-fullstack-a2m8.onrender.com/api';
 
 export interface Profile {
   id: number;
