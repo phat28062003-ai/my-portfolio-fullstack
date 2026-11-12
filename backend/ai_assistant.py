@@ -75,16 +75,23 @@ class ContactMessageRequest(BaseModel):
 async def root():
     return {"status": "ok", "message": "AI Resume Assistant API is running"}
 
-# 1. API CHATBOT
+CHAT_CACHE = {}
+
+# 1. API CHATBOT TỐC ĐỘ CAO (FAST IN-MEMORY CACHE & GEMINI LITE)
 @app.post("/api/ai-chat/")
 async def chat_with_resume_ai(request: ChatRequest):
-    if not request.message.strip():
+    clean_msg = request.message.strip().lower()
+    if not clean_msg:
         raise HTTPException(status_code=400, detail="Câu hỏi không được để trống.")
+    
+    # Kiểm tra phản hồi tức thì từ cache
+    if clean_msg in CHAT_CACHE:
+        return {"reply": CHAT_CACHE[clean_msg]}
     
     client = get_gemini_client()
     
-    # Danh sách model theo thứ tự ưu tiên (phòng trường hợp 1 model bị giới hạn hoặc thay đổi)
-    models_to_try = ["gemini-3.5-flash", "gemini-3.1-flash-lite"]
+    # Ưu tiên mô hình nhẹ, phản hồi siêu tốc dưới 1 giây
+    models_to_try = ["gemini-3.1-flash-lite", "gemini-3.5-flash"]
     last_error = None
     
     for model_name in models_to_try:
@@ -92,8 +99,17 @@ async def chat_with_resume_ai(request: ChatRequest):
             response = client.models.generate_content(
                 model=model_name,
                 contents=f"{RESUME_CONTEXT}\n\nCâu hỏi của người dùng: {request.message}",
+                config={
+                    "max_output_tokens": 200,
+                    "temperature": 0.6
+                }
             )
-            return {"reply": response.text}
+            reply = response.text
+            if reply:
+                if len(CHAT_CACHE) > 100:
+                    CHAT_CACHE.pop(next(iter(CHAT_CACHE)))
+                CHAT_CACHE[clean_msg] = reply
+                return {"reply": reply}
         except Exception as e:
             last_error = e
             traceback.print_exc()

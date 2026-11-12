@@ -25,6 +25,34 @@ interface Message {
   timestamp: string;
 }
 
+// Bộ nhớ đệm Client giúp phản hồi siêu tốc tức thì
+const CLIENT_CACHE: Record<string, { text: string; action?: MessageAction }> = {
+  'dự án': {
+    text: 'Dưới đây là 2 dự án Full-stack tiêu biểu nhất của Tiến Phát:\n\n1. Ứng Dụng Todo Quản Lý Công Việc: TypeScript/Vite & FastAPI/Django REST (xác thực JWT bảo mật).\n2. Personal Portfolio & AI Assistant: Web Cyberpunk tích hợp Gemini AI và GitHub Live Dashboard.\n\nTôi đã mở ngay danh sách dự án cho bạn rồi nhé!',
+    action: { label: 'Xem Danh Sách Dự Án 🚀', type: 'tab', target: 'profile' }
+  },
+  'kỹ năng': {
+    text: 'Tiến Phát có thế mạnh chuyên sâu về:\n• Backend: Python (FastAPI, Django REST Framework), PostgreSQL, SQLite.\n• Frontend: TypeScript, JavaScript, React, Vite, CSS/Responsive.\n• AI: Tích hợp Google Gemini API, Xử lý ngôn ngữ tự nhiên.\n• DevOps: Git, GitHub Actions, Vercel, Render.\n\nTôi đã đưa bạn đến bảng chi tiết kỹ năng!',
+    action: { label: 'Xem Chi Tiết Kỹ Năng ⚡', type: 'tab', target: 'skills' }
+  },
+  'kinh nghiệm': {
+    text: 'Tiến Phát có hơn 2 năm kinh nghiệm thực chiến tự xây dựng và vận hành các sản phẩm Full-stack kết hợp AI, làm chủ quy trình từ thiết kế API đến giao diện tối ưu trải nghiệm người dùng.',
+    action: { label: 'Xem Chi Tiết Kinh Nghiệm 💼', type: 'tab', target: 'experience' }
+  },
+  'nhật ký': {
+    text: 'Mục Nhật Ký là nơi Tiến Phát lưu lại các kiến thức công nghệ mới và chia sẻ kinh nghiệm lập trình thực tế. Tôi đã chuyển bạn đến trang Nhật Ký!',
+    action: { label: 'Đọc Nhật Ký Học Tập 📝', type: 'tab', target: 'blog' }
+  },
+  'liên hệ': {
+    text: 'Rất hoan nghênh bạn! Bạn có thể gửi tin nhắn qua Form bên dưới hoặc liên hệ trực tiếp:\n• Email: phat28062003@gmail.com\n• GitHub: github.com/phat28062003-ai\n\nTôi đã mở sẵn Form liên hệ cho bạn!',
+    action: { label: 'Đến Form Liên Hệ 📬', type: 'tab', target: 'contact' }
+  },
+  'giao diện': {
+    text: 'Đã chuyển đổi giao diện Sáng / Tối cho bạn! Bạn thấy giao diện này thế nào?',
+    action: { label: 'Đã Đổi Giao Diện 🌓', type: 'theme' }
+  }
+};
+
 export const AIChatWidget: React.FC<AIChatWidgetProps> = ({
   setActiveTab,
   setSelectedTech,
@@ -120,11 +148,98 @@ export const AIChatWidget: React.FC<AIChatWidgetProps> = ({
     }
   };
 
-  // Xử lý gửi tin nhắn & Điều phối hành động (Agentic Action Execution)
+  // Hiệu ứng Typewriter Streaming siêu tốc (giúp câu trả lời tuôn ra mượt mà tức thì)
+  const streamResponse = (fullText: string, action?: MessageAction) => {
+    const aiMsgId = `ai-${Date.now()}`;
+    const timeStr = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+
+    // Tạo tin nhắn AI ban đầu
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: aiMsgId,
+        sender: 'ai',
+        text: '',
+        action: action,
+        timestamp: timeStr
+      }
+    ]);
+
+    const words = fullText.split(' ');
+    let currentIndex = 0;
+
+    const interval = setInterval(() => {
+      currentIndex += 3; // Hiện mỗi lần 3 từ để tốc độ cực nhanh mà vẫn mượt
+      if (currentIndex >= words.length) {
+        clearInterval(interval);
+        setMessages((prev) =>
+          prev.map((m) => (m.id === aiMsgId ? { ...m, text: fullText } : m))
+        );
+        setLoading(false);
+        if (autoSpeak) speakText(fullText);
+      } else {
+        const partialText = words.slice(0, currentIndex).join(' ');
+        setMessages((prev) =>
+          prev.map((m) => (m.id === aiMsgId ? { ...m, text: partialText } : m))
+        );
+      }
+    }, 20); // 20ms mỗi bước -> Cực nhanh và mượt mà
+  };
+
+  // Điều phối hành động giao diện ngay lập tức (0ms Instant Action Pre-dispatch)
+  const executeInstantIntent = (lowerQuery: string) => {
+    if (lowerQuery.includes('kỹ năng') || lowerQuery.includes('skill') || lowerQuery.includes('công nghệ')) {
+      setActiveTab('skills');
+      scrollToTop();
+      return { label: 'Xem Tab Kỹ Năng ⚡', type: 'tab' as const, target: 'skills' };
+    }
+    if (lowerQuery.includes('dự án') || lowerQuery.includes('project') || lowerQuery.includes('todo')) {
+      setActiveTab('profile');
+      setTimeout(() => {
+        window.scrollTo({ top: 380, behavior: 'smooth' });
+      }, 100);
+      return { label: 'Xem Các Dự Án 🚀', type: 'tab' as const, target: 'profile' };
+    }
+    if (lowerQuery.includes('kinh nghiệm') || lowerQuery.includes('experience')) {
+      setActiveTab('experience');
+      scrollToTop();
+      return { label: 'Xem Kinh Nghiệm 💼', type: 'tab' as const, target: 'experience' };
+    }
+    if (lowerQuery.includes('nhật ký') || lowerQuery.includes('blog')) {
+      setActiveTab('blog');
+      scrollToTop();
+      return { label: 'Đọc Nhật Ký Học Tập 📝', type: 'tab' as const, target: 'blog' };
+    }
+    if (lowerQuery.includes('liên hệ') || lowerQuery.includes('contact') || lowerQuery.includes('phỏng vấn') || lowerQuery.includes('email')) {
+      setActiveTab('contact');
+      scrollToTop();
+      return { label: 'Đến Form Liên Hệ 📬', type: 'tab' as const, target: 'contact' };
+    }
+    if (lowerQuery.includes('giao diện') || lowerQuery.includes('sáng') || lowerQuery.includes('tối') || lowerQuery.includes('theme')) {
+      toggleTheme();
+      return { label: 'Đã đổi giao diện Sáng/Tối 🌓', type: 'theme' as const };
+    }
+    if (lowerQuery.includes('typescript')) {
+      setActiveTab('profile');
+      setSelectedTech('TypeScript');
+      setTimeout(() => window.scrollTo({ top: 400, behavior: 'smooth' }), 100);
+      return { label: 'Đang lọc dự án: TypeScript 🛠️', type: 'filter' as const };
+    }
+    if (lowerQuery.includes('react') || lowerQuery.includes('fastapi')) {
+      setActiveTab('profile');
+      setSelectedTech('React / Vite / FastAPI');
+      setTimeout(() => window.scrollTo({ top: 400, behavior: 'smooth' }), 100);
+      return { label: 'Đang lọc dự án: React/FastAPI ⚛️', type: 'filter' as const };
+    }
+    return undefined;
+  };
+
+  // Xử lý gửi tin nhắn & Điều phối hành động tốc độ cao
   const sendMessage = async (contentToSend?: string) => {
     const textToSend = (contentToSend || input).trim();
     if (!textToSend || loading) return;
 
+    const lowerQuery = textToSend.toLowerCase();
     const timeStr = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
     const userMsg: Message = {
       id: `user-${Date.now()}`,
@@ -137,14 +252,28 @@ export const AIChatWidget: React.FC<AIChatWidgetProps> = ({
     setInput('');
     setLoading(true);
 
+    // 1. KÍCH HOẠT HÀNH ĐỘNG GIAO DIỆN TỨC THÌ (0ms INSTANT ACTION)
+    const preAction = executeInstantIntent(lowerQuery);
+
+    // 2. KIỂM TRA BỘ NHỚ ĐỆM TỨC THÌ (INSTANT CLIENT CACHE)
+    for (const [key, cached] of Object.entries(CLIENT_CACHE)) {
+      if (lowerQuery.includes(key)) {
+        setTimeout(() => {
+          streamResponse(cached.text, preAction || cached.action);
+        }, 50);
+        return;
+      }
+    }
+
+    // 3. GỌI GEMINI LITE API VỚI TỐC ĐỘ CAO
     try {
       const data = await sendAIChatMessage(textToSend);
 
       if (data && data.reply) {
         let replyText = data.reply;
-        let action: MessageAction | undefined = undefined;
+        let action: MessageAction | undefined = preAction;
 
-        // Phân tích và thực thi hành động điều khiển giao diện (Action Tags)
+        // Phân tích thẻ hành động bổ sung nếu có
         if (replyText.includes('[ACTION:NAVIGATE_SKILLS]')) {
           setActiveTab('skills');
           scrollToTop();
@@ -152,9 +281,7 @@ export const AIChatWidget: React.FC<AIChatWidgetProps> = ({
         } else if (replyText.includes('[ACTION:NAVIGATE_PROJECTS]')) {
           setActiveTab('profile');
           action = { label: 'Xem Các Dự Án 🚀', type: 'tab', target: 'profile' };
-          setTimeout(() => {
-            window.scrollTo({ top: 380, behavior: 'smooth' });
-          }, 150);
+          setTimeout(() => window.scrollTo({ top: 380, behavior: 'smooth' }), 100);
         } else if (replyText.includes('[ACTION:NAVIGATE_EXPERIENCE]')) {
           setActiveTab('experience');
           scrollToTop();
@@ -167,23 +294,6 @@ export const AIChatWidget: React.FC<AIChatWidgetProps> = ({
           setActiveTab('contact');
           scrollToTop();
           action = { label: 'Đến Form Liên Hệ 📬', type: 'tab', target: 'contact' };
-        } else if (replyText.includes('[ACTION:FILTER_TYPESCRIPT]')) {
-          setActiveTab('profile');
-          setSelectedTech('TypeScript');
-          action = { label: 'Đang lọc dự án: TypeScript 🛠️', type: 'filter' };
-          setTimeout(() => {
-            window.scrollTo({ top: 400, behavior: 'smooth' });
-          }, 150);
-        } else if (replyText.includes('[ACTION:FILTER_REACT]')) {
-          setActiveTab('profile');
-          setSelectedTech('React / Vite / FastAPI');
-          action = { label: 'Đang lọc dự án: React/FastAPI ⚛️', type: 'filter' };
-          setTimeout(() => {
-            window.scrollTo({ top: 400, behavior: 'smooth' });
-          }, 150);
-        } else if (replyText.includes('[ACTION:TOGGLE_THEME]')) {
-          toggleTheme();
-          action = { label: 'Đã đổi giao diện Sáng/Tối 🌓', type: 'theme' };
         } else if (replyText.includes('[ACTION:DOWNLOAD_CV]')) {
           action = {
             label: 'Mở GitHub Profile & CV 📄',
@@ -192,23 +302,14 @@ export const AIChatWidget: React.FC<AIChatWidgetProps> = ({
           };
         }
 
-        // Loại bỏ thẻ action ra khỏi text hiển thị
+        // Loại bỏ thẻ action khỏi nội dung hiển thị
         replyText = replyText.replace(/\[ACTION:[^\]]+\]/g, '').trim();
 
-        const aiMsg: Message = {
-          id: `ai-${Date.now()}`,
-          sender: 'ai',
-          text: replyText,
-          action: action,
-          timestamp: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
-        };
+        // Lưu vào bộ nhớ đệm client để lần sau phản hồi tức thì
+        CLIENT_CACHE[lowerQuery] = { text: replyText, action };
 
-        setMessages((prev) => [...prev, aiMsg]);
-
-        // Nếu người dùng bật chế độ tự động đọc (autoSpeak)
-        if (autoSpeak) {
-          speakText(replyText);
-        }
+        // Hiển thị mượt mà với hiệu ứng chữ chạy siêu tốc
+        streamResponse(replyText, action);
       } else {
         setMessages((prev) => [
           ...prev,
@@ -219,6 +320,7 @@ export const AIChatWidget: React.FC<AIChatWidgetProps> = ({
             timestamp: timeStr
           }
         ]);
+        setLoading(false);
       }
     } catch {
       setMessages((prev) => [
@@ -230,7 +332,6 @@ export const AIChatWidget: React.FC<AIChatWidgetProps> = ({
           timestamp: timeStr
         }
       ]);
-    } finally {
       setLoading(false);
     }
   };
@@ -346,11 +447,11 @@ export const AIChatWidget: React.FC<AIChatWidgetProps> = ({
                     padding: '1px 6px',
                     borderRadius: '8px',
                     fontWeight: 600
-                  }}>Agentic AI</span>
+                  }}>⚡ Fast Gemini</span>
                 </div>
                 <div style={{ fontSize: '0.7rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <span style={{ width: '6px', height: '6px', backgroundColor: '#22c55e', borderRadius: '50%' }}></span>
-                  Gemini 3.5 • Điều khiển trực tiếp web
+                  Phản hồi siêu tốc • Điều khiển trực tiếp
                 </div>
               </div>
             </div>
@@ -460,7 +561,7 @@ export const AIChatWidget: React.FC<AIChatWidgetProps> = ({
                     boxShadow: msg.sender === 'user' ? '0 4px 12px rgba(2, 132, 199, 0.3)' : '0 2px 8px rgba(0, 0, 0, 0.4)'
                   }}
                 >
-                  {msg.text}
+                  {msg.text || (loading && msg.sender === 'ai' ? '...' : '')}
 
                   {/* Nút hành động tương tác (Interactive Action Button) */}
                   {msg.action && (
@@ -502,7 +603,7 @@ export const AIChatWidget: React.FC<AIChatWidgetProps> = ({
                   padding: '0 4px'
                 }}>
                   <span>{msg.timestamp}</span>
-                  {msg.sender === 'ai' && (
+                  {msg.sender === 'ai' && msg.text && (
                     <button
                       onClick={() => speakText(msg.text)}
                       title="Nghe tin nhắn này"
@@ -527,7 +628,7 @@ export const AIChatWidget: React.FC<AIChatWidgetProps> = ({
             {loading && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#38bdf8', fontSize: '0.82rem', paddingLeft: '4px' }}>
                 <span style={{ display: 'inline-block', animation: 'spin 1s infinite linear' }}>⚡</span>
-                Trợ lý AI đang tư duy & xử lý yêu cầu...
+                Đang xử lý siêu tốc...
               </div>
             )}
             <div ref={messagesEndRef} />
