@@ -4,6 +4,7 @@ import {
   getProfile, getProjects, getSkills,
   getExperiences, getBlogPosts, sendAIChatMessage
 } from './api';
+import { GitHubActivity } from './GitHubActivity';
 import './style.css';
 
 // ==========================================
@@ -573,16 +574,7 @@ export default function App() {
               </button>
             </div>
 
-            {showGithubWidget && (
-              <div className="card" style={{ textAlign: 'center', marginTop: '10px' }}>
-                <h3 style={{ fontSize: '1.3rem', marginBottom: '15px', color: '#38bdf8' }}>📊 Hoạt Động GitHub</h3>
-                <img
-                  src="https://github-readme-stats.vercel.app/api?username=phat28062003-ai&show_icons=true&theme=tokyonight&hide_border=true&bg_color=030712"
-                  alt="GitHub Stats"
-                  style={{ maxWidth: '100%', borderRadius: '12px' }}
-                />
-              </div>
-            )}
+            {showGithubWidget && <GitHubActivity />}
           </div>
         )}
 
