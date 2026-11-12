@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import confetti from 'canvas-confetti';
 import {
   getProfile, getProjects, getSkills,
   getExperiences, getBlogPosts
@@ -8,6 +7,10 @@ import { GitHubActivity } from './GitHubActivity';
 import { AIChatWidget } from './AIChatWidget';
 import { ParticleBackground } from './ParticleBackground';
 import { SkillsSection } from './SkillsSection';
+import { ProjectsSection } from './ProjectsSection';
+import { ExperienceSection } from './ExperienceSection';
+import { BlogSection } from './BlogSection';
+import { ContactSection } from './ContactSection';
 import './style.css';
 
 // Helper xử lý đường dẫn ảnh
@@ -29,17 +32,12 @@ export default function App() {
   const [profile, setProfile] = useState<any>(null);
   const [projects, setProjects] = useState<any[]>([]);
   const [skills, setSkills] = useState<any[]>([]);
-  const [experiences, setExperiences] = useState<any[]>([]);
-  const [blogs, setBlogs] = useState<any[]>([]);
+  const [, setExperiences] = useState<any[]>([]);
+  const [, setBlogs] = useState<any[]>([]);
 
-  const [selectedTech, setSelectedTech] = useState('All');
+  const [, setSelectedTech] = useState('All');
   const [typedTitle, setTypedTitle] = useState('');
   const [showScrollTop, setShowScrollTop] = useState(false);
-
-  const [contactForm, setContactForm] = useState({ name: '', email: '', message: '' });
-  const [statusMsg, setStatusMsg] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
   const [showGithubWidget, setShowGithubWidget] = useState(true);
 
   useEffect(() => {
@@ -50,7 +48,7 @@ export default function App() {
       bio: 'Chào bạn, mình là Lữ Tiến Phát, một lập trình viên Full-stack trẻ tuổi và đầy nhiệt huyết. Mình có thế mạnh trong việc xây dựng các ứng dụng web hiện đại, kết hợp mạnh mẽ giữa Django Backend và Vite/TypeScript Frontend. Mình luôn tò mò học hỏi công nghệ mới và tập trung tạo ra những sản phẩm có trải nghiệm mượt mà, tối ưu.',
       email: 'phat28062003@gmail.com',
       github: 'https://github.com/phat28062003-ai',
-      location: 'Mỹ Tho, Việt Nam',
+      location: 'Mỹ Tho, Tiền Giang, Việt Nam',
       avatar: 'profiles/p.jpg'
     };
 
@@ -62,51 +60,8 @@ export default function App() {
       { id: 5, name: 'Git & Deployment (Vercel, PythonAnywhere)', proficiency: 75, category: 'DevOps' }
     ];
 
-    const defaultExperiences = [
-      {
-        id: 1,
-        role: 'Full-stack Developer',
-        company: 'Personal Projects',
-        period: '2023 - Present',
-        description: 'Phát triển các ứng dụng Full-stack với Django REST Framework, React/TypeScript và Gemini AI.'
-      }
-    ];
-
-    const defaultBlogs = [
-      {
-        id: 1,
-        title: 'Hôm nay ngày 30/10',
-        summary: 'Học đọc kiến thức mới',
-        content: 'Hôm nay học đọc thêm nhiều kiến thức mới về Django, React và tích hợp AI. Từng bước hoàn thiện dự án fullstack và nâng cấp giao diện phong cách cyberpunk.',
-        image: 'blog_images/images_lKvqlr2.jfif',
-        image_caption: 'Giao diện & hệ thống',
-        created_at: '2026-10-30T04:40:15Z'
-      },
-      {
-        id: 2,
-        title: 'Dog',
-        summary: 'So cute',
-        content: 'Chú cún cưng siêu đáng yêu! Khoảnh khắc thư giãn tuyệt vời sau những giờ lập trình căng thẳng.',
-        image: 'blog_images/download_1.jfif',
-        image_caption: 'Cute dog',
-        created_at: '2026-10-30T04:48:40Z'
-      }
-    ];
-
-    const todoAppProject = {
-      id: 'todo-fullstack-fixed',
-      title: 'Full-stack Todo Application',
-      description: 'Ứng dụng quản lý công việc toàn diện, xây dựng với Django REST Framework ở Backend và TypeScript/Vite ở Frontend với giao diện responsive tối ưu.',
-      technology: 'TypeScript',
-      github: 'https://github.com/phat28062003-ai',
-      demo: 'https://todo-frontend-tawny-iota.vercel.app/#/'
-    };
-
     setProfile(defaultProfile);
     setSkills(defaultSkills);
-    setExperiences(defaultExperiences);
-    setBlogs(defaultBlogs);
-    setProjects([todoAppProject]);
 
     getProfile().then((data) => {
       if (data) {
@@ -116,15 +71,24 @@ export default function App() {
         });
       }
     }).catch(() => { });
+
     getProjects().then((apiProjects) => {
       if (Array.isArray(apiProjects) && apiProjects.length > 0) {
-        const otherProjects = apiProjects.filter((p: any) => p.title !== todoAppProject.title);
-        setProjects([todoAppProject, ...otherProjects]);
+        setProjects(apiProjects);
       }
     }).catch(() => { });
-    getSkills().then((data) => { if (Array.isArray(data) && data.length > 0) setSkills(data); }).catch(() => { });
-    getExperiences().then((data) => { if (Array.isArray(data) && data.length > 0) setExperiences(data); }).catch(() => { });
-    getBlogPosts().then((data) => { if (Array.isArray(data) && data.length > 0) setBlogs(data); }).catch(() => { });
+
+    getSkills().then((data) => {
+      if (Array.isArray(data) && data.length > 0) setSkills(data);
+    }).catch(() => { });
+
+    getExperiences().then((data) => {
+      if (Array.isArray(data) && data.length > 0) setExperiences(data);
+    }).catch(() => { });
+
+    getBlogPosts().then((data) => {
+      if (Array.isArray(data) && data.length > 0) setBlogs(data);
+    }).catch(() => { });
 
     const handleScroll = () => {
       if (window.scrollY > 300) {
@@ -138,7 +102,7 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const fullText = profile?.title || 'Full-stack Developer | Python & TypeScript Enthusiast';
+    const fullText = profile?.title || 'Full-stack Developer & AI Engineer Aspirant';
     let index = 0;
     setTypedTitle('');
     const timer = setInterval(() => {
@@ -161,46 +125,6 @@ export default function App() {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-
-  const handleContactSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!contactForm.name || !contactForm.email || !contactForm.message) return;
-
-    setIsSubmitting(true);
-    setStatusMsg('');
-
-    try {
-      const response = await fetch("https://formspree.io/f/xnppryjl", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json"
-        },
-        body: JSON.stringify({
-          name: contactForm.name,
-          email: contactForm.email,
-          message: contactForm.message
-        })
-      });
-
-      if (response.ok) {
-        confetti({ particleCount: 120, spread: 70, origin: { y: 0.6 } });
-        setStatusMsg('🚀 Tuyệt vời! Tin nhắn của bạn đã được gửi thành công và chuyển đến email của tôi.');
-        setContactForm({ name: '', email: '', message: '' });
-      } else {
-        setStatusMsg('❌ Có lỗi xảy ra khi gửi. Vui lòng thử lại sau!');
-      }
-    } catch (error) {
-      setStatusMsg('❌ Lỗi kết nối mạng. Vui lòng kiểm tra lại!');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const technologies = ['All', ...Array.from(new Set(projects.map(p => p.technology).filter(Boolean)))];
-  const filteredProjects = selectedTech === 'All'
-    ? projects
-    : projects.filter(p => p.technology === selectedTech);
 
   return (
     <div>
@@ -252,72 +176,26 @@ export default function App() {
               </div>
             )}
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '40px 0 20px 0', flexWrap: 'wrap' }}>
-              <h2 id="projects-heading" style={{ fontSize: '1.8rem', display: 'flex', alignItems: 'center', gap: '10px', margin: 0, color: 'var(--text-main)' }}>
-                <span>🚀</span> Các Dự Án Nổi Bật
-              </h2>
+            {/* Các Dự Án Nổi Bật Siêu Đẹp & Hiện Đại */}
+            <ProjectsSection apiProjects={projects} />
 
-              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                {technologies.map((tech) => (
-                  <button
-                    key={tech}
-                    onClick={() => setSelectedTech(tech)}
-                    style={{
-                      background: selectedTech === tech ? 'linear-gradient(135deg, #38bdf8, #818cf8)' : 'var(--card-bg)',
-                      color: selectedTech === tech ? '#fff' : 'var(--text-muted)',
-                      border: '1px solid var(--card-border)',
-                      padding: '6px 14px',
-                      borderRadius: '20px',
-                      cursor: 'pointer',
-                      fontWeight: 600,
-                      fontSize: '0.82rem',
-                      transition: 'all 0.3s ease'
-                    }}
-                  >
-                    {tech}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {filteredProjects.length > 0 ? (
-              filteredProjects.map((p) => (
-                <div key={p.id} className="card animated-card-hover" style={{ position: 'relative' }}>
-                  <h3 style={{ fontSize: '1.4rem', marginBottom: '10px', color: '#38bdf8' }}>{p.title}</h3>
-                  <p style={{ color: 'var(--text-muted)', lineHeight: '1.6', marginBottom: '15px' }}>{p.description}</p>
-
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-                    <span style={{ background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8', padding: '6px 14px', borderRadius: '20px', fontSize: '0.82rem', fontWeight: 600 }}>
-                      🛠 {p.technology}
-                    </span>
-
-                    <div style={{ display: 'flex', gap: '12px' }}>
-                      {p.github && (
-                        <a href={p.github} target="_blank" rel="noreferrer" style={{ color: '#38bdf8', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 600 }}>
-                          GitHub ↗
-                        </a>
-                      )}
-                      {(p.demo || p.live_demo) && (
-                        <a href={p.demo || p.live_demo} target="_blank" rel="noreferrer" style={{ color: '#c084fc', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 600 }}>
-                          Live Demo ↗
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="card" style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
-                <p>🚀 Không tìm thấy dự án phù hợp.</p>
-              </div>
-            )}
-
-            <div style={{ textAlign: 'right', marginTop: '20px' }}>
+            {/* GitHub Activity Dashboard */}
+            <div style={{ textAlign: 'right', marginTop: '35px', marginBottom: '10px' }}>
               <button
                 onClick={() => setShowGithubWidget(!showGithubWidget)}
-                style={{ background: 'transparent', border: '1px solid var(--card-border)', color: 'var(--text-muted)', padding: '6px 12px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.85rem' }}
+                style={{
+                  background: 'transparent',
+                  border: '1px solid var(--card-border)',
+                  color: 'var(--text-muted)',
+                  padding: '6px 14px',
+                  borderRadius: '20px',
+                  cursor: 'pointer',
+                  fontSize: '0.85rem',
+                  fontWeight: 600,
+                  transition: 'all 0.2s ease'
+                }}
               >
-                {showGithubWidget ? '👁️ Ẩn Hoạt Động GitHub' : '👁️ Hiện Hoạt Động GitHub'}
+                {showGithubWidget ? '👁️ Ẩn Bảng Hoạt Động GitHub' : '👁️ Hiện Bảng Hoạt Động GitHub'}
               </button>
             </div>
 
@@ -325,113 +203,22 @@ export default function App() {
           </div>
         )}
 
+        {/* Tab Kỹ Năng: Cyberpunk Tech Matrix */}
         {activeTab === 'skills' && <SkillsSection skills={skills} />}
 
-        {activeTab === 'experience' && (
-          <div className="tab-content">
-            <h2 style={{ fontSize: '1.8rem', marginBottom: '25px', color: 'var(--text-main)' }}>💼 Quá Trình & Kinh Nghiệm</h2>
-            {experiences.length > 0 ? (
-              experiences.map((exp) => (
-                <div key={exp.id} className="card">
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', flexWrap: 'wrap' }}>
-                    <h3 style={{ color: '#38bdf8', fontSize: '1.3rem' }}>{exp.role}</h3>
-                    <span style={{ background: 'rgba(192, 132, 252, 0.1)', color: '#c084fc', padding: '4px 12px', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 600 }}>
-                      {exp.period}
-                    </span>
-                  </div>
-                  <h4 style={{ color: 'var(--text-muted)', marginBottom: '15px', fontWeight: 500 }}>{exp.company}</h4>
-                  <p style={{ lineHeight: '1.7', color: 'var(--text-main)' }}>{exp.description}</p>
-                </div>
-              ))
-            ) : (
-              <div className="card" style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
-                <p>Chưa có thông tin kinh nghiệm.</p>
-              </div>
-            )}
-          </div>
-        )}
+        {/* Tab Kinh Nghiệm: Cyberpunk Career Timeline */}
+        {activeTab === 'experience' && <ExperienceSection />}
 
-        {activeTab === 'blog' && (
-          <div className="tab-content">
-            <h2 style={{ fontSize: '1.8rem', marginBottom: '25px', color: 'var(--text-main)' }}>📝 Nhật Ký & Bài Viết Cá Nhân</h2>
-            {blogs.length > 0 ? (
-              blogs.map((b) => (
-                <article key={b.id} className="card">
-                  <h3 style={{ fontSize: '1.5rem', marginBottom: '8px', color: 'var(--text-main)' }}>{b.title}</h3>
-                  <small style={{ color: 'var(--text-muted)' }}>📅 Đăng ngày: {new Date(b.created_at).toLocaleDateString()}</small>
-                  {b.image && (
-                    <div style={{ marginTop: '12px' }}>
-                      <img
-                        src={getMediaUrl(b.image)}
-                        alt={b.title}
-                        className="blog-img"
-                        style={{ maxWidth: '100%', borderRadius: '8px' }}
-                      />
-                      {b.image_caption && <p className="img-caption" style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginTop: '6px' }}>📸 {b.image_caption}</p>}
-                    </div>
-                  )}
-                  <p style={{ marginTop: '15px', lineHeight: '1.8', color: 'var(--text-main)' }}>{b.content}</p>
-                </article>
-              ))
-            ) : (
-              <div className="card" style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
-                <p>Chưa có bài viết nhật ký nào. Truy cập <a href="https://phatne.pythonanywhere.com/admin/" target="_blank" rel="noreferrer" style={{ color: '#38bdf8', textDecoration: 'underline' }}>Django Admin</a> để thêm bài viết mới.</p>
-              </div>
-            )}
-          </div>
-        )}
+        {/* Tab Nhật Ký: Tech Magazine Grid */}
+        {activeTab === 'blog' && <BlogSection getMediaUrl={getMediaUrl} />}
 
+        {/* Tab Liên Hệ: Cyberpunk Contact Hub */}
         {activeTab === 'contact' && (
-          <div className="tab-content card">
-            <h2 style={{ fontSize: '1.8rem', marginBottom: '10px', color: 'var(--text-main)' }}>📬 Hộp Thư Liên Hệ</h2>
-            <p style={{ color: 'var(--text-muted)', marginBottom: '25px' }}>Hãy gửi lời nhắn cho tôi!</p>
-            {statusMsg && (
-              <div style={{ background: statusMsg.includes('❌') ? 'rgba(239, 68, 68, 0.1)' : 'rgba(74, 222, 128, 0.1)', color: statusMsg.includes('❌') ? '#ef4444' : '#4ade80', padding: '12px 16px', borderRadius: '12px', marginBottom: '20px', fontWeight: 500 }}>
-                {statusMsg}
-              </div>
-            )}
-            <form onSubmit={handleContactSubmit}>
-              <div className="form-group">
-                <label>Họ và Tên</label>
-                <input
-                  type="text"
-                  name="name"
-                  className="form-input"
-                  placeholder="Nguyễn Văn A"
-                  required
-                  value={contactForm.name}
-                  onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
-                />
-              </div>
-              <div className="form-group">
-                <label>Email</label>
-                <input
-                  type="email"
-                  name="email"
-                  className="form-input"
-                  placeholder="name@example.com"
-                  required
-                  value={contactForm.email}
-                  onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
-                />
-              </div>
-              <div className="form-group">
-                <label>Nội dung</label>
-                <textarea
-                  rows={5}
-                  name="message"
-                  className="form-textarea"
-                  placeholder="Nội dung tin nhắn..."
-                  required
-                  value={contactForm.message}
-                  onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
-                ></textarea>
-              </div>
-              <button type="submit" className="submit-btn" disabled={isSubmitting}>
-                {isSubmitting ? 'Đang gửi...' : 'Gửi Lời Nhắn 🚀'}
-              </button>
-            </form>
-          </div>
+          <ContactSection
+            initialEmail={profile?.email}
+            initialGithub={profile?.github}
+            initialLocation={profile?.location}
+          />
         )}
 
         <button
