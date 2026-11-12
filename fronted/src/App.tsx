@@ -6,6 +6,7 @@ import {
 } from './api';
 import { GitHubActivity } from './GitHubActivity';
 import { AIChatWidget } from './AIChatWidget';
+import { ParticleBackground } from './ParticleBackground';
 import './style.css';
 
 // Helper xử lý đường dẫn ảnh
@@ -202,6 +203,7 @@ export default function App() {
 
   return (
     <div>
+      <ParticleBackground theme={theme} />
       <nav className="navbar">
         {(['profile', 'skills', 'experience', 'blog', 'contact'] as const).map((tab) => (
           <button
@@ -230,20 +232,15 @@ export default function App() {
         {activeTab === 'profile' && (
           <div className="tab-content">
             {profile && (
-              <div className="card" style={{ textAlign: 'center', padding: '50px 30px' }}>
-                <img
-                  src={getMediaUrl(profile.avatar || 'profiles/p.jpg')}
-                  alt={profile.full_name || 'Lữ Tiến Phát'}
-                  style={{
-                    width: '130px',
-                    height: '130px',
-                    borderRadius: '50%',
-                    objectFit: 'cover',
-                    border: '3px solid #38bdf8',
-                    boxShadow: '0 0 25px rgba(56, 189, 248, 0.4)',
-                    marginBottom: '20px'
-                  }}
-                />
+              <div className="card animated-card-hover" style={{ textAlign: 'center', padding: '50px 30px' }}>
+                <div className="avatar-wrapper">
+                  <div className="avatar-neon-ring"></div>
+                  <img
+                    src={getMediaUrl(profile.avatar || 'profiles/p.jpg')}
+                    alt={profile.full_name || 'Lữ Tiến Phát'}
+                    className="avatar-img"
+                  />
+                </div>
                 <h1 className="profile-title">{profile.full_name}</h1>
                 <p style={{ color: '#c084fc', fontSize: '1.2rem', margin: '15px 0', fontWeight: 600, minHeight: '30px' }}>
                   {typedTitle}<span style={{ opacity: 0.7, animation: 'blink 1s infinite' }}>|</span>
@@ -284,7 +281,7 @@ export default function App() {
 
             {filteredProjects.length > 0 ? (
               filteredProjects.map((p) => (
-                <div key={p.id} className="card" style={{ position: 'relative' }}>
+                <div key={p.id} className="card animated-card-hover" style={{ position: 'relative' }}>
                   <h3 style={{ fontSize: '1.4rem', marginBottom: '10px', color: '#38bdf8' }}>{p.title}</h3>
                   <p style={{ color: 'var(--text-muted)', lineHeight: '1.6', marginBottom: '15px' }}>{p.description}</p>
 
